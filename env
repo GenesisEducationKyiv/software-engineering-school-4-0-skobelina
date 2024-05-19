@@ -1,0 +1,4 @@
+export DATABASE_URL="postgres://postgres:mypassword@127.0.0.1:5432/gses?sslmode=disable"
+export APP_CURRENCY_EXCHANGE_URL="https://api.apilayer.com/exchangerates_data/latest"
+export APP_CURRENCY_EXCHANGE_KEY="EPPBjcIYnYl0rToRCEWpzFm3S8JYWCRq"
+export MAILPASS="i k r e e z q k k h f l i j n o"
