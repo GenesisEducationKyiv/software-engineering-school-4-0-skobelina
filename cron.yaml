@@ -1,0 +1,5 @@
+cron:
+  - description: "notifications exchange rates"
+    url: /api/cron-jobs/notifications/exchange-rates/E6B3C4F7
+    schedule: every day 10:00
+    target: api-exchange-rates
