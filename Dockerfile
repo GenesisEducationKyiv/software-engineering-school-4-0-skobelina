@@ -1,6 +1,6 @@
 
 # Golang docker image
-FROM golang:1.19
+FROM golang:1.22.4
 
 # Set necessary environmet variables needed for our image
 ENV GO111MODULE=on \
