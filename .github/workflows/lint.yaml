@@ -1,0 +1,37 @@
+name: lint
+
+on:
+  push:
+    branches:
+      - '*'
+  pull_request_target:
+    types:
+      - opened
+      - edited
+      - synchronize
+
+jobs:
+  golang-lint:
+    name: gosec
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: checkout code
+        uses: actions/checkout@v3
+
+      - name: set up go
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.22.4
+
+      - name: install golangci-lint
+        run: go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
+
+      - name: run golangci-lint
+        run: golangci-lint run
+
+      - name: install gosec
+        run: go install github.com/securego/gosec/v2/cmd/gosec@latest
+
+      - name: run gosec
+        run: "`go env GOPATH`/bin/gosec ./..."

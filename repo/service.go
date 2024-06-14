@@ -12,8 +12,7 @@ import (
 )
 
 func Connect(databaseURL string) (*gorm.DB, error) {
-	logLevel := logger.Silent
-	logLevel = logger.Info
+	logLevel := logger.Info
 	newLogger := logger.New(
 		log.New(os.Stdout, "\r\n", log.LstdFlags),
 		logger.Config{
