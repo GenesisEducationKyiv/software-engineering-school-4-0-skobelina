@@ -12,18 +12,25 @@ import (
 
 const cronKey = "E6B3C4F7"
 
-func NewHandler(config *CronJobConfig) rest.Registrable {
-	return &handler{config: config}
+type CronJobServiceInterface interface {
+	Close() error
+	NotificationExchangeRates() error
+}
+
+type handler struct {
+	config  *CronJobConfig
+	service CronJobServiceInterface
 }
 
 type CronJobConfig struct {
 	DatabaseURL   string
 	CurrencyRates float64
-	MailService   mails.Service
+	MailService   *mails.MailService
 }
 
-type handler struct {
-	config *CronJobConfig
+func NewHandler(config *CronJobConfig) rest.Registrable {
+	service := NewService(config)
+	return &handler{config: config, service: service}
 }
 
 func (h *handler) Register(r *mux.Router) {

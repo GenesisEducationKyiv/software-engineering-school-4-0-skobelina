@@ -10,9 +10,9 @@ import (
 )
 
 type dependancies struct {
-	rates         rates.Service
-	subscribers   subscribers.Service
-	mailService   mails.Service
+	rates         *rates.RateService
+	subscribers   *subscribers.SubscriberService
+	mailService   *mails.MailService
 	currencyRates float64
 }
 

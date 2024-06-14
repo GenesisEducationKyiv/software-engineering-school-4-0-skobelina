@@ -4,41 +4,36 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/skobelina/currency_converter/domains/mails"
 	"github.com/skobelina/currency_converter/domains/rates"
+	"github.com/skobelina/currency_converter/repo"
 
 	"github.com/skobelina/currency_converter/domains/subscribers"
-	"github.com/skobelina/currency_converter/repo"
 
 	"gorm.io/gorm"
 )
 
-type Service interface {
-	NotificationExchangeRates() error
-	Close() error
-}
-
-type service struct {
+type CronJobService struct {
 	repo        *gorm.DB
-	mail        mails.Service
-	rates       rates.Service
-	subscribers subscribers.Service
+	mail        mails.MailService
+	rates       rates.RateServiceInterface
+	subscribers subscribers.SubscriberServiceInterface
 }
 
-func NewService(config *CronJobConfig) Service {
+func NewService(config *CronJobConfig) *CronJobService {
 	repo, err := repo.Connect(config.DatabaseURL)
 	if err != nil {
 		panic(err)
 	}
 	rates := rates.NewService(repo)
 	subscribers := subscribers.NewService(repo)
-	return &service{
+	return &CronJobService{
 		repo,
-		config.MailService,
+		*config.MailService,
 		rates,
 		subscribers,
 	}
 }
 
-func (s *service) Close() error {
+func (s *CronJobService) Close() error {
 	db, err := s.repo.DB()
 	if err != nil {
 		logrus.Errorf("CronJobs: Close: %v", err)

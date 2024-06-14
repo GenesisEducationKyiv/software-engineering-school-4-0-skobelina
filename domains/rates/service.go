@@ -7,19 +7,15 @@ import (
 	errors "github.com/skobelina/currency_converter/utils/errors"
 )
 
-type Service interface {
-	Get() (*float64, error)
-}
-
-type service struct {
+type RateService struct {
 	repo *gorm.DB
 }
 
-func NewService(repo *gorm.DB) Service {
-	return &service{repo}
+func NewService(repo *gorm.DB) *RateService {
+	return &RateService{repo}
 }
 
-func (s *service) Get() (*float64, error) {
+func (s *RateService) Get() (*float64, error) {
 	rate, err := currencies.GetCurrencyRates()
 	if err != nil {
 		return nil, errors.NewInternalServerErrorf("cannot get currency rates: %v", err)

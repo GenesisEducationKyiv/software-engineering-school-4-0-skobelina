@@ -8,20 +8,15 @@ import (
 	errors "github.com/skobelina/currency_converter/utils/errors"
 )
 
-type Service interface {
-	Create(request *SubscriberRequest) (*string, error)
-	Search(filter *SearchSubscribeRequest) (*SearchSubscribeResponse, error)
-}
-
-type service struct {
+type SubscriberService struct {
 	repo *gorm.DB
 }
 
-func NewService(repo *gorm.DB) Service {
-	return &service{repo}
+func NewService(repo *gorm.DB) *SubscriberService {
+	return &SubscriberService{repo}
 }
 
-func (s *service) Create(request *SubscriberRequest) (*string, error) {
+func (s *SubscriberService) Create(request *SubscriberRequest) (*string, error) {
 	subscriber := request.Map()
 	if err := subscriber.Validate(); err != nil {
 		return nil, err
@@ -38,7 +33,7 @@ func (s *service) Create(request *SubscriberRequest) (*string, error) {
 	return &status, nil
 }
 
-func (s *service) checkEmail(email string) (bool, error) {
+func (s *SubscriberService) checkEmail(email string) (bool, error) {
 	var count int64
 	if err := s.repo.
 		Model(&Subscriber{}).
@@ -49,7 +44,7 @@ func (s *service) checkEmail(email string) (bool, error) {
 	return count > 0, nil
 }
 
-func (s *service) Search(filter *SearchSubscribeRequest) (*SearchSubscribeResponse, error) {
+func (s *SubscriberService) Search(filter *SearchSubscribeRequest) (*SearchSubscribeResponse, error) {
 	if filter == nil {
 		filter = new(SearchSubscribeRequest)
 		filter.Validate()

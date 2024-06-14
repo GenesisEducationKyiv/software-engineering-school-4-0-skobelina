@@ -19,20 +19,14 @@ const (
 	messagesCountPerMinute     = 25
 )
 
-type Service interface {
-	SendBatch(messages ...*Message) error
-	SendEmail(recipients []string, subject string, temp Template) error
-}
-
-type service struct {
+type MailService struct {
 	username string
 	host     string
-
 	messages chan []*gomail.Message
 }
 
-func NewService(username string, host string) Service {
-	s := &service{
+func NewService(username string, host string) *MailService {
+	s := &MailService{
 		username: username,
 		host:     host,
 
@@ -50,7 +44,7 @@ type Message struct {
 	Template   Template
 }
 
-func (s *service) SendEmail(recipients []string, subject string, temp Template) error {
+func (s *MailService) SendEmail(recipients []string, subject string, temp Template) error {
 	message := &Message{
 		Recipients: recipients,
 		Subject:    subject,
@@ -59,7 +53,7 @@ func (s *service) SendEmail(recipients []string, subject string, temp Template) 
 	return s.SendBatch(message)
 }
 
-func (s *service) SendBatch(messages ...*Message) error {
+func (s *MailService) SendBatch(messages ...*Message) error {
 	preparedMessages := prepare(messages...)
 	for i := 0; i < len(preparedMessages); i += messagesLimitPerSending {
 		first, last := i, messagesLimitPerSending+i
@@ -85,7 +79,7 @@ func prepare(messages ...*Message) []*gomail.Message {
 	return gomailMessages
 }
 
-func (s *service) scheduler() {
+func (s *MailService) scheduler() {
 	var sendCloser gomail.SendCloser
 	var err error
 
