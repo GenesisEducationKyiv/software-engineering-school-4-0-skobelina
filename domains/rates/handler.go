@@ -5,6 +5,7 @@ import (
 
 	"github.com/gorilla/mux"
 
+	utils "github.com/skobelina/currency_converter/utils/errors"
 	"github.com/skobelina/currency_converter/utils/rest"
 	"github.com/skobelina/currency_converter/utils/serializer"
 )
@@ -35,7 +36,11 @@ func (h *handler) Register(r *mux.Router) {
 func (h *handler) get(w http.ResponseWriter, r *http.Request) error {
 	response, err := h.service.Get()
 	if err != nil {
-		return err
+		if err.Error() == "bad request" {
+			return utils.NewBadRequestError("bad request")
+		} else {
+			return utils.NewInternalServerError("internal server error")
+		}
 	}
 	return serializer.SendJSON(w, http.StatusOK, response)
 }
