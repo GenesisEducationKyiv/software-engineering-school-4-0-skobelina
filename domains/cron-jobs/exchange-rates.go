@@ -11,7 +11,7 @@ import (
 )
 
 func (s *CronJobService) NotificationExchangeRates() error {
-	subscribersResp, err := s.subscribers.Search(&subscribers.SearchSubscribeRequest{
+	subscribersResp, err := s.Subscribers.Search(&subscribers.SearchSubscribeRequest{
 		Filter: domains.DefaultFilter(),
 	})
 	if err != nil {
@@ -23,7 +23,7 @@ func (s *CronJobService) NotificationExchangeRates() error {
 	}
 	currentTime := time.Now().Format("2006-01-02")
 
-	exchangeRate, err := s.rates.Get()
+	exchangeRate, err := s.Rates.Get()
 	if err != nil {
 		return err
 	}
@@ -31,7 +31,7 @@ func (s *CronJobService) NotificationExchangeRates() error {
 		CreatedAt:    currentTime,
 		ExchangeRate: strconv.FormatFloat(*exchangeRate, 'f', 2, 64),
 	}
-	if err := s.mail.SendEmail(recipients, "Exchange rates notification", template); err != nil {
+	if err := s.Mail.SendEmail(recipients, "Exchange rates notification", template); err != nil {
 		logrus.Errorf("CronJob: NotificationExchangeRates: %v", err)
 	}
 

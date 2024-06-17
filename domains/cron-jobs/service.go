@@ -12,10 +12,10 @@ import (
 )
 
 type CronJobService struct {
-	repo        *gorm.DB
-	mail        mails.MailService
-	rates       rates.RateServiceInterface
-	subscribers subscribers.SubscriberServiceInterface
+	Repo        *gorm.DB
+	Mail        mails.MailServiceInterface
+	Rates       rates.RateServiceInterface
+	Subscribers subscribers.SubscriberServiceInterface
 }
 
 func NewService(config *CronJobConfig) *CronJobService {
@@ -25,16 +25,17 @@ func NewService(config *CronJobConfig) *CronJobService {
 	}
 	rates := rates.NewService(repo)
 	subscribers := subscribers.NewService(repo)
+	mails := mails.NewService(mails.DefaultMailSendAddress, mails.DefaultMailHost)
 	return &CronJobService{
 		repo,
-		*config.MailService,
+		mails,
 		rates,
 		subscribers,
 	}
 }
 
 func (s *CronJobService) Close() error {
-	db, err := s.repo.DB()
+	db, err := s.Repo.DB()
 	if err != nil {
 		logrus.Errorf("CronJobs: Close: %v", err)
 		return err
