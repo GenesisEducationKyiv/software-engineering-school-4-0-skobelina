@@ -9,14 +9,14 @@ import (
 	"github.com/skobelina/currency_converter/utils/currencies"
 )
 
-type dependancies struct {
+type dependencies struct {
 	rates         *rates.RateService
 	subscribers   *subscribers.SubscriberService
 	mailService   *mails.MailService
 	currencyRates float64
 }
 
-func registerDependencies() *dependancies {
+func registerDependencies() *dependencies {
 	repo, err := repo.Connect(databaseURL)
 	if err != nil {
 		panic(err)
@@ -31,7 +31,7 @@ func registerDependencies() *dependancies {
 	if err != nil {
 		logrus.Infof("cannot preload currency rates: %v\n", err)
 	}
-	return &dependancies{
+	return &dependencies{
 		rates:         rates,
 		subscribers:   subscribers,
 		mailService:   mailService,
