@@ -13,7 +13,6 @@ import (
 	cronJobs "github.com/skobelina/currency_converter/domains/cron-jobs"
 	"github.com/skobelina/currency_converter/domains/rates"
 	"github.com/skobelina/currency_converter/domains/subscribers"
-	"github.com/skobelina/currency_converter/repo"
 )
 
 var (
@@ -33,11 +32,7 @@ func New() Api {
 	r := mux.NewRouter()
 	rates.NewHandler(deps.Rates).Register(r)
 	subscribers.NewHandler(deps.Subscribers).Register(r)
-	repo, err := repo.Connect(databaseURL)
-	if err != nil {
-		panic(err)
-	}
-	cronJobService := cronJobs.NewService(repo, deps.MailService, deps.Rates, deps.Subscribers)
+	cronJobService := cronJobs.NewService(deps.Repo, deps.MailService, deps.Rates, deps.Subscribers)
 	cronJobs.NewHandler(cronJobService).Register(r)
 
 	r.Use(
