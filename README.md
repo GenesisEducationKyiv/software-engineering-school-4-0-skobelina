@@ -26,7 +26,7 @@ $ source .env
 
 ## PR Pipeline
 
-- Run `go mod tidy` to verify and update dependancies.
+- Run `go mod tidy` to verify and update dependencies.
 
 - Run gosec:
 

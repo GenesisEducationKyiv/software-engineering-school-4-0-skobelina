@@ -19,7 +19,7 @@ type handler struct {
 	service RateServiceInterface
 }
 
-func NewHandler(s RateServiceInterface) rest.Registrable {
+func NewHandler(s RateServiceInterface) *handler {
 	return &handler{s}
 }
 
