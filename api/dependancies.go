@@ -26,8 +26,9 @@ func registerDependencies() *dependencies {
 	if err := repo.AutoMigrate(&subscribers.Subscriber{}); err != nil {
 		logrus.Infof("failed to migrate database: %v", err)
 	}
+	subscriberRepo := subscribers.NewRepository(repo)
 	rates := rates.NewService(repo)
-	subscribers := subscribers.NewService(repo)
+	subscribers := subscribers.NewService(subscriberRepo)
 	mailService := mails.NewService(mails.DefaultMailSendAddress, mails.DefaultMailHost)
 	currencyRates, err := currencies.GetCurrencyRates()
 	if err != nil {
