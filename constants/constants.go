@@ -13,3 +13,7 @@ const (
 	OrderASC  = "asc"
 	OrderDESC = "desc"
 )
+const (
+	CurrencyUSD = "USD"
+	CurrencyUAH = "UAH"
+)
