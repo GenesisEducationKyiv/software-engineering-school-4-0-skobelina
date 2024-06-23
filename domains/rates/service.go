@@ -1,24 +1,27 @@
 package rates
 
 import (
-	"gorm.io/gorm"
-
 	"github.com/skobelina/currency_converter/utils/currencies"
 	errors "github.com/skobelina/currency_converter/utils/errors"
+	"gorm.io/gorm"
 )
 
 type RateService struct {
-	repo *gorm.DB
+	repo    *gorm.DB
+	handler currencies.CurrencyHandler
 }
 
 func NewService(repo *gorm.DB) *RateService {
-	return &RateService{repo}
+	providerExchangeRates := &currencies.ProviderExchangeRates{}
+	providerCurrencyBeacon := &currencies.ProviderCurrencyBeacon{}
+	providerExchangeRates.SetNext(providerCurrencyBeacon)
+	return &RateService{repo: repo, handler: providerExchangeRates}
 }
 
 func (s *RateService) Get() (*float64, error) {
-	rate, err := currencies.GetCurrencyRates()
+	rate, err := s.handler.Handle()
 	if err != nil {
-		return nil, errors.NewInternalServerErrorf("cannot get currency rates: %v", err)
+		return nil, errors.NewInternalServerErrorf("all providers failed: %v", err)
 	}
 	return &rate, nil
 }
