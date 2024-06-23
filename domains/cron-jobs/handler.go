@@ -32,7 +32,6 @@ func (h *handler) notificationExchangeRates(w http.ResponseWriter, r *http.Reque
 	if valid := validateCronjobRequest(r); !valid {
 		return errors.NewForbiddenError()
 	}
-	defer h.service.Close()
 	err := h.service.NotificationExchangeRates()
 	if err != nil {
 		return err
