@@ -4,7 +4,6 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/skobelina/currency_converter/domains/mails"
 	"github.com/skobelina/currency_converter/domains/rates"
-	"github.com/skobelina/currency_converter/repo"
 
 	"github.com/skobelina/currency_converter/domains/subscribers"
 
@@ -13,23 +12,17 @@ import (
 
 type CronJobService struct {
 	repo        *gorm.DB
-	mail        mails.MailService
+	mail        *mails.MailService
 	rates       rates.RateServiceInterface
 	subscribers subscribers.SubscriberServiceInterface
 }
 
-func NewService(config *CronJobConfig) *CronJobService {
-	repo, err := repo.Connect(config.DatabaseURL)
-	if err != nil {
-		panic(err)
-	}
-	rates := rates.NewService(repo)
-	subscribers := subscribers.NewService(repo)
+func NewService(repo *gorm.DB, mail *mails.MailService, rates rates.RateServiceInterface, subscribers subscribers.SubscriberServiceInterface) *CronJobService {
 	return &CronJobService{
-		repo,
-		*config.MailService,
-		rates,
-		subscribers,
+		repo:        repo,
+		mail:        mail,
+		rates:       rates,
+		subscribers: subscribers,
 	}
 }
 

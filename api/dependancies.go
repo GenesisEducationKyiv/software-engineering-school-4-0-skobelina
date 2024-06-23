@@ -10,9 +10,9 @@ import (
 )
 
 type dependencies struct {
-	rates         *rates.RateService
-	subscribers   *subscribers.SubscriberService
-	mailService   *mails.MailService
+	Rates         *rates.RateService
+	Subscribers   *subscribers.SubscriberService
+	MailService   *mails.MailService
 	currencyRates float64
 }
 
@@ -32,9 +32,9 @@ func registerDependencies() *dependencies {
 		logrus.Infof("cannot preload currency rates: %v\n", err)
 	}
 	return &dependencies{
-		rates:         rates,
-		subscribers:   subscribers,
-		mailService:   mailService,
+		Rates:         rates,
+		Subscribers:   subscribers,
+		MailService:   mailService,
 		currencyRates: currencyRates,
 	}
 }
