@@ -7,16 +7,18 @@ import (
 	"github.com/skobelina/currency_converter/domains/subscribers"
 	"github.com/skobelina/currency_converter/repo"
 	"github.com/skobelina/currency_converter/utils/currencies"
+	"gorm.io/gorm"
 )
 
-type dependancies struct {
-	rates         rates.Service
-	subscribers   subscribers.Service
-	mailService   mails.Service
+type dependencies struct {
+	Repo          *gorm.DB
+	Rates         *rates.RateService
+	Subscribers   *subscribers.SubscriberService
+	MailService   *mails.MailService
 	currencyRates float64
 }
 
-func registerDependencies() *dependancies {
+func registerDependencies() *dependencies {
 	repo, err := repo.Connect(databaseURL)
 	if err != nil {
 		panic(err)
@@ -31,10 +33,11 @@ func registerDependencies() *dependancies {
 	if err != nil {
 		logrus.Infof("cannot preload currency rates: %v\n", err)
 	}
-	return &dependancies{
-		rates:         rates,
-		subscribers:   subscribers,
-		mailService:   mailService,
+	return &dependencies{
+		Repo:          repo,
+		Rates:         rates,
+		Subscribers:   subscribers,
+		MailService:   mailService,
 		currencyRates: currencyRates,
 	}
 }

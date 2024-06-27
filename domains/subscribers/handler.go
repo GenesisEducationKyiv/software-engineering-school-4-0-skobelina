@@ -11,12 +11,17 @@ import (
 	"github.com/skobelina/currency_converter/utils/serializer"
 )
 
-func NewHandler(s Service) rest.Registrable {
-	return &handler{s}
+type SubscriberServiceInterface interface {
+	Create(request *SubscriberRequest) (*string, error)
+	Search(filter *SearchSubscribeRequest) (*SearchSubscribeResponse, error)
 }
 
 type handler struct {
-	service Service
+	service SubscriberServiceInterface
+}
+
+func NewHandler(s SubscriberServiceInterface) *handler {
+	return &handler{s}
 }
 
 func (h *handler) Register(r *mux.Router) {

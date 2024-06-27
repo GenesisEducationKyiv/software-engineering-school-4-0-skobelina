@@ -30,13 +30,10 @@ type api struct {
 func New() Api {
 	deps := registerDependencies()
 	r := mux.NewRouter()
-	rates.NewHandler(deps.rates).Register(r)
-	subscribers.NewHandler(deps.subscribers).Register(r)
-	cronJobs.NewHandler(&cronJobs.CronJobConfig{
-		DatabaseURL:   databaseURL,
-		CurrencyRates: deps.currencyRates,
-		MailService:   deps.mailService,
-	}).Register(r)
+	rates.NewHandler(deps.Rates).Register(r)
+	subscribers.NewHandler(deps.Subscribers).Register(r)
+	cronJobService := cronJobs.NewService(deps.Repo, deps.MailService, deps.Rates, deps.Subscribers)
+	cronJobs.NewHandler(cronJobService).Register(r)
 
 	r.Use(
 		OptionsHandler(),

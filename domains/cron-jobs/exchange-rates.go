@@ -10,7 +10,7 @@ import (
 	"github.com/skobelina/currency_converter/domains/subscribers"
 )
 
-func (s *service) NotificationExchangeRates() error {
+func (s *CronJobService) NotificationExchangeRates() error {
 	subscribersResp, err := s.subscribers.Search(&subscribers.SearchSubscribeRequest{
 		Filter: domains.DefaultFilter(),
 	})

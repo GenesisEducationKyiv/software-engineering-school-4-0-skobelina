@@ -4,7 +4,6 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
-	"github.com/skobelina/currency_converter/domains/mails"
 	errors "github.com/skobelina/currency_converter/utils/errors"
 	"github.com/skobelina/currency_converter/utils/rest"
 	"github.com/skobelina/currency_converter/utils/serializer"
@@ -12,18 +11,17 @@ import (
 
 const cronKey = "E6B3C4F7"
 
-func NewHandler(config *CronJobConfig) rest.Registrable {
-	return &handler{config: config}
-}
-
-type CronJobConfig struct {
-	DatabaseURL   string
-	CurrencyRates float64
-	MailService   mails.Service
+type CronJobServiceInterface interface {
+	Close() error
+	NotificationExchangeRates() error
 }
 
 type handler struct {
-	config *CronJobConfig
+	service CronJobServiceInterface
+}
+
+func NewHandler(s CronJobServiceInterface) *handler {
+	return &handler{s}
 }
 
 func (h *handler) Register(r *mux.Router) {
@@ -34,9 +32,8 @@ func (h *handler) notificationExchangeRates(w http.ResponseWriter, r *http.Reque
 	if valid := validateCronjobRequest(r); !valid {
 		return errors.NewForbiddenError()
 	}
-	service := NewService(h.config)
-	defer service.Close()
-	err := service.NotificationExchangeRates()
+	defer h.service.Close()
+	err := h.service.NotificationExchangeRates()
 	if err != nil {
 		return err
 	}
