@@ -69,9 +69,5 @@ func (p *ProviderExchangeRates) Handle() (float64, error) {
 		logrus.Errorf("ProviderExchangeRates - USD or UAH rate not found")
 		return p.BaseHandler.Handle()
 	}
-
-	usdToEur := 1 / usdRate
-	usdToUah := usdToEur * uahRate
-
-	return usdToUah, nil
+	return uahRate / usdRate, nil
 }
