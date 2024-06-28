@@ -7,11 +7,11 @@ import (
 	"testing"
 
 	"github.com/gorilla/mux"
+	utils "github.com/skobelina/currency_converter/utils/errors"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )
 
-// MockService is a mock implementation of the rates.Service interface
 type MockService struct {
 	mock.Mock
 }
@@ -44,5 +44,47 @@ func TestHandler_GetRate_Success(t *testing.T) {
 	expectedResponse, err := json.Marshal(mockResponse)
 	assert.NoError(t, err)
 	assert.JSONEq(t, string(expectedResponse), rr.Body.String())
+	mockService.AssertExpectations(t)
+}
+
+func TestHandler_GetRate_InternalServerError(t *testing.T) {
+	mockService := new(MockService)
+	mockService.On("Get").Return(nil, utils.NewInternalServerError("internal server error"))
+
+	handler := NewHandler(mockService)
+	router := mux.NewRouter()
+	handler.Register(router)
+
+	req, err := http.NewRequest("GET", "/api/rate", nil)
+	assert.NoError(t, err)
+
+	rr := httptest.NewRecorder()
+
+	router.ServeHTTP(rr, req)
+
+	assert.Equal(t, http.StatusInternalServerError, rr.Code)
+	expectedResponse := `{"message": "internal server error", "type": "Internal server error"}`
+	assert.JSONEq(t, expectedResponse, rr.Body.String())
+	mockService.AssertExpectations(t)
+}
+
+func TestHandler_GetRate_BadRequest(t *testing.T) {
+	mockService := new(MockService)
+	mockService.On("Get").Return(nil, utils.NewBadRequestError("bad request"))
+
+	handler := NewHandler(mockService)
+	router := mux.NewRouter()
+	handler.Register(router)
+
+	req, err := http.NewRequest("GET", "/api/rate", nil)
+	assert.NoError(t, err)
+
+	rr := httptest.NewRecorder()
+
+	router.ServeHTTP(rr, req)
+
+	assert.Equal(t, http.StatusBadRequest, rr.Code)
+	expectedResponse := `{"message": "bad request", "type": "Bad request"}`
+	assert.JSONEq(t, expectedResponse, rr.Body.String())
 	mockService.AssertExpectations(t)
 }

@@ -4,7 +4,9 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
+	"gorm.io/gorm"
 
+	utils "github.com/skobelina/currency_converter/utils/errors"
 	"github.com/skobelina/currency_converter/utils/rest"
 	"github.com/skobelina/currency_converter/utils/serializer"
 )
@@ -35,7 +37,15 @@ func (h *handler) Register(r *mux.Router) {
 func (h *handler) get(w http.ResponseWriter, r *http.Request) error {
 	response, err := h.service.Get()
 	if err != nil {
-		return err
+		if err == gorm.ErrRecordNotFound {
+			return utils.NewItemNotFoundError("rate not found")
+		} else if err.Error() == "bad request" {
+			return utils.NewBadRequestError("bad request")
+		} else if err.Error() == "internal server error" {
+			return utils.NewInternalServerError("internal server error")
+		} else {
+			return err
+		}
 	}
 	return serializer.SendJSON(w, http.StatusOK, response)
 }

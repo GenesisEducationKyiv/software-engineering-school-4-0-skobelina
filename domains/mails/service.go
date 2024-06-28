@@ -19,11 +19,18 @@ const (
 	messagesCountPerMinute     = 25
 )
 
+type MailServiceInterface interface {
+	SendEmail(recipients []string, subject string, temp Template) error
+	SendBatch(messages ...*Message) error
+}
+
 type MailService struct {
 	username string
 	host     string
 	messages chan []*gomail.Message
 }
+
+var _ MailServiceInterface = (*MailService)(nil)
 
 func NewService(username string, host string) *MailService {
 	s := &MailService{
