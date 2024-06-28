@@ -65,6 +65,7 @@ func (p *ProviderCurrencyBeacon) Handle() (float64, error) {
 	var data CurrencyBeaconResponse
 	if err := json.Unmarshal(body, &data); err != nil {
 		logrus.Errorf("ProviderCurrencyBeacon - Failed to unmarshal response: %v", err)
+		logrus.Errorf("ProviderCurrencyBeacon - Response body: %s", string(body))
 		return p.BaseHandler.Handle()
 	}
 

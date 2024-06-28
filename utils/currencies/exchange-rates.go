@@ -60,6 +60,7 @@ func (p *ProviderExchangeRates) Handle() (float64, error) {
 	var data CurrencyData
 	if err := json.Unmarshal(body, &data); err != nil {
 		logrus.Errorf("ProviderExchangeRates - Failed to unmarshal response: %v", err)
+		logrus.Errorf("ProviderExchangeRates - Response body: %s", string(body))
 		return p.BaseHandler.Handle()
 	}
 
