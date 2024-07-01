@@ -16,7 +16,7 @@ func TestArchitecture(t *testing.T) {
 					Internal: []string{
 						"domains",
 						"utils",
-						"repo",
+						"infrastructure/repo",
 					},
 				},
 			},
@@ -63,6 +63,7 @@ func TestArchitecture(t *testing.T) {
 				ShouldOnlyDependsOn: &config.Dependencies{
 					Internal: []string{
 						"domains",
+						"infrastructure/currencies",
 						"utils",
 					},
 				},
@@ -86,7 +87,7 @@ func TestArchitecture(t *testing.T) {
 				},
 			},
 			{
-				Package: "repo",
+				Package: "infrastructure/repo",
 				ShouldOnlyDependsOn: &config.Dependencies{
 					Internal: []string{
 						"utils",

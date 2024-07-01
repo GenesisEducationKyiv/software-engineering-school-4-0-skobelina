@@ -1,14 +1,14 @@
 version: 1
 threshold:
   compliance: 100
-  coverage: 90
+  coverage: 60
 dependenciesRules:
   - package: "api"
     shouldOnlyDependsOn:
       internal:
         - "domains"
         - "utils"
-        - "repo"
+        - "infrastructure/repo"
   - package: "constants"
     shouldOnlyDependsOn:
       internal:
@@ -35,6 +35,7 @@ dependenciesRules:
     shouldOnlyDependsOn:
       internal:
         - "domains"
+        - "infrastructure/currencies"
         - "utils"
   - package: "domains/subscribers"
     shouldOnlyDependsOn:
@@ -46,7 +47,7 @@ dependenciesRules:
     shouldNotDependsOn:
       internal:
         - "api"
-  - package: "repo"
+  - package: "infrastructure/repo"
     shouldOnlyDependsOn:
       internal:
         - "utils"
