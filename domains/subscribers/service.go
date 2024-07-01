@@ -1,18 +1,17 @@
 package subscribers
 
 import (
-	"gorm.io/gorm"
-
 	"github.com/skobelina/currency_converter/constants"
 	"github.com/skobelina/currency_converter/domains"
 	errors "github.com/skobelina/currency_converter/utils/errors"
+	"gorm.io/gorm"
 )
 
 type SubscriberService struct {
-	repo *gorm.DB
+	repo Repository
 }
 
-func NewService(repo *gorm.DB) *SubscriberService {
+func NewService(repo Repository) *SubscriberService {
 	return &SubscriberService{repo}
 }
 
@@ -26,7 +25,7 @@ func (s *SubscriberService) Create(request *SubscriberRequest) (*string, error) 
 	} else if exists {
 		return nil, errors.NewIsConflictError("email already exists")
 	}
-	if err := s.repo.Create(subscriber).Error; err != nil {
+	if err := s.repo.Create(subscriber); err != nil {
 		return nil, errors.NewInternalServerErrorf("cannot create email db row: %v", err)
 	}
 	status := constants.StatusAdded
@@ -34,14 +33,14 @@ func (s *SubscriberService) Create(request *SubscriberRequest) (*string, error) 
 }
 
 func (s *SubscriberService) checkEmail(email string) (bool, error) {
-	var count int64
-	if err := s.repo.
-		Model(&Subscriber{}).
-		Where("email = ?", email).
-		Count(&count).Error; err != nil {
+	subscriber, err := s.repo.FindByEmail(email)
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return false, nil
+		}
 		return false, errors.NewInternalServerErrorf("failed to check email: %v", err)
 	}
-	return count > 0, nil
+	return subscriber != nil, nil
 }
 
 func (s *SubscriberService) Search(filter *SearchSubscribeRequest) (*SearchSubscribeResponse, error) {
@@ -50,21 +49,9 @@ func (s *SubscriberService) Search(filter *SearchSubscribeRequest) (*SearchSubsc
 		filter.Validate()
 	}
 
-	q := s.repo.
-		Table("subscribers").
-		Offset(filter.Offset).
-		Limit(filter.Limit).
-		Order(filter.OrderString())
-
-	var subscribers []Subscriber
-	if err := q.Find(&subscribers).Error; err != nil {
+	subscribers, count, err := s.repo.Search(filter)
+	if err != nil {
 		return nil, errors.NewInternalServerErrorf("cannot get subscribers: %v", err)
-	}
-	var count int64
-	q = s.repo.
-		Table("subscribers")
-	if err := q.Count(&count).Error; err != nil {
-		return nil, errors.NewInternalServerErrorf("cannot count subscribers: %v", err)
 	}
 
 	return &SearchSubscribeResponse{
