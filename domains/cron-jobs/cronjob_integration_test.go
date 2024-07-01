@@ -49,16 +49,8 @@ func TestNotificationExchangeRates_Success(t *testing.T) {
 		},
 	}
 	mockSubscriberService.EXPECT().Search(gomock.Any()).Return(mockSubscribers, nil)
-
 	mockMailService.EXPECT().SendEmail(gomock.Any(), "Exchange rates notification", gomock.Any()).Return(nil)
-
-	cronJobService := &cronjobs.CronJobService{
-		Repo:        db,
-		Mail:        mockMailService,
-		Rates:       mockRateService,
-		Subscribers: mockSubscriberService,
-	}
-
+	cronJobService := cronjobs.NewService(db, mockMailService, mockRateService, mockSubscriberService)
 	err := cronJobService.NotificationExchangeRates()
 	assert.NoError(t, err)
 }
@@ -79,17 +71,9 @@ func TestNotificationExchangeRates_Error(t *testing.T) {
 	mockMailService := mails.NewMockMailServiceInterface(ctrl)
 	mockRateService := rates.NewMockRateServiceInterface(ctrl)
 	mockSubscriberService := subscribers.NewMockSubscriberServiceInterface(ctrl)
-
 	mockRateService.EXPECT().Get().Return(nil, errors.New("internal server error"))
 	mockSubscriberService.EXPECT().Search(gomock.Any()).Return(&subscribers.SearchSubscribeResponse{}, nil)
-
-	cronJobService := &cronjobs.CronJobService{
-		Repo:        db,
-		Mail:        mockMailService,
-		Rates:       mockRateService,
-		Subscribers: mockSubscriberService,
-	}
-
+	cronJobService := cronjobs.NewService(db, mockMailService, mockRateService, mockSubscriberService)
 	err := cronJobService.NotificationExchangeRates()
 	assert.Error(t, err)
 }
