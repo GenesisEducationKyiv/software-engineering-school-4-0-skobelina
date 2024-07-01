@@ -5,7 +5,7 @@ import (
 	"github.com/skobelina/currency_converter/domains/mails"
 	"github.com/skobelina/currency_converter/domains/rates"
 	"github.com/skobelina/currency_converter/domains/subscribers"
-	"github.com/skobelina/currency_converter/repo"
+	"github.com/skobelina/currency_converter/infrastructure/repo"
 	"gorm.io/gorm"
 )
 
