@@ -35,3 +35,9 @@ jobs:
 
       - name: run gosec
         run: "`go env GOPATH`/bin/gosec ./..."
+
+      - name: install arch-go
+        run: go install github.com/fdaines/arch-go@latest
+
+      - name: run arch-go
+        run: arch-go
