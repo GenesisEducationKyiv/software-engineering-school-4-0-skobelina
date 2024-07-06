@@ -26,7 +26,7 @@ jobs:
       run: go mod download
 
     - name: rates tests
-      run: go test -v ./domains/rates
+      run: go test -v ./internal/rates
 
     - name: subscribers tests
-      run: go test -v ./domains/subscribers
+      run: go test -v ./internal/subscribers
