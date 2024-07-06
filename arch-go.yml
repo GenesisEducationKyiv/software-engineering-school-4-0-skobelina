@@ -6,53 +6,77 @@ dependenciesRules:
   - package: "api"
     shouldOnlyDependsOn:
       internal:
-        - "domains"
-        - "utils"
-        - "infrastructure/repo"
-  - package: "constants"
+        - "internal/cron-jobs"
+        - "internal/mails"
+        - "internal/rates"
+        - "internal/subscribers"
+        - "pkg/utils"
+        - "pkg/repo"
+  - package: "internal/constants"
     shouldOnlyDependsOn:
       internal:
-        - "domains"
-        - "utils"
+        - "internal/cron-jobs"
+        - "internal/mails"
+        - "internal/rates"
+        - "internal/subscribers"
+        - "pkg/utils"
   - package: "docs"
     shouldOnlyDependsOn:
       internal:
-        - "domains"
-  - package: "domains/cron-jobs"
+        - "internal/cron-jobs"
+        - "internal/mails"
+        - "internal/rates"
+        - "internal/subscribers"
+  - package: "internal/cron-jobs"
     shouldOnlyDependsOn:
       internal:
-        - "domains"
-        - "utils"
-        - "domains/mails"
-        - "domains/rates"
-        - "domains/subscribers"
-  - package: "domains/mails"
+        - "internal/cron-jobs"
+        - "pkg/utils"
+        - "internal/mails"
+        - "internal/rates"
+        - "internal/subscribers"
+        - "internal"
+  - package: "internal/mails"
     shouldOnlyDependsOn:
       internal:
-        - "domains"
-        - "utils"
-  - package: "domains/rates"
+        - "internal/cron-jobs"
+        - "pkg/utils"
+  - package: "internal/rates"
     shouldOnlyDependsOn:
       internal:
-        - "domains"
+        - "internal/cron-jobs"
         - "infrastructure/currencies"
-        - "utils"
-  - package: "domains/subscribers"
+        - "pkg/utils"
+  - package: "internal/subscribers"
     shouldOnlyDependsOn:
       internal:
-        - "domains"
-        - "utils"
-        - "constants"
-  - package: "domains"
+        - "internal/cron-jobs"
+        - "pkg/utils"
+        - "internal/constants"
+        - "internal"
+  - package: "internal/cron-jobs"
     shouldNotDependsOn:
       internal:
         - "api"
-  - package: "infrastructure/repo"
+  - package: "pkg/repo"
     shouldOnlyDependsOn:
       internal:
-        - "utils"
-  - package: "utils"
+        - "pkg/utils"
+  - package: "pkg/utils"
     shouldNotDependsOn:
       internal:
         - "api"
-        - "domains"
+        - "internal/cron-jobs"
+  - package: "infrastructure/currencies"
+    shouldNotDependsOn:
+      internal:
+        - "api"
+        - "internal/cron-jobs"
+
+contentsRules:
+  - package: "README.md"
+    shouldContain: ["# ExchangeRates v1", "## How to run", "## PR Pipeline", "## API doc with swagger", "## Mock tests"]
+
+namingRules:
+  - package: "internal"
+    shouldFollowConvention: "camelCase"

@@ -4,9 +4,9 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
-	errors "github.com/skobelina/currency_converter/utils/errors"
-	"github.com/skobelina/currency_converter/utils/rest"
-	"github.com/skobelina/currency_converter/utils/serializer"
+	errors "github.com/skobelina/currency_converter/pkg/utils/errors"
+	"github.com/skobelina/currency_converter/pkg/utils/rest"
+	"github.com/skobelina/currency_converter/pkg/utils/serializer"
 )
 
 const cronKey = "E6B3C4F7"

@@ -5,9 +5,9 @@ import (
 	"time"
 
 	"github.com/sirupsen/logrus"
-	"github.com/skobelina/currency_converter/domains"
-	"github.com/skobelina/currency_converter/domains/mails/templates"
-	"github.com/skobelina/currency_converter/domains/subscribers"
+	domains "github.com/skobelina/currency_converter/internal"
+	"github.com/skobelina/currency_converter/internal/mails/templates"
+	"github.com/skobelina/currency_converter/internal/subscribers"
 )
 
 func (s *CronJobService) NotificationExchangeRates() error {

@@ -8,8 +8,8 @@ import (
 	"testing"
 
 	"github.com/gorilla/mux"
-	"github.com/skobelina/currency_converter/domains/subscribers"
-	utils "github.com/skobelina/currency_converter/utils/errors"
+	"github.com/skobelina/currency_converter/internal/subscribers"
+	utils "github.com/skobelina/currency_converter/pkg/utils/errors"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )

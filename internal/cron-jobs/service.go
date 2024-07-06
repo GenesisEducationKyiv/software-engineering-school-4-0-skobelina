@@ -2,10 +2,10 @@ package cronjobs
 
 import (
 	"github.com/sirupsen/logrus"
-	"github.com/skobelina/currency_converter/domains/mails"
-	"github.com/skobelina/currency_converter/domains/rates"
+	"github.com/skobelina/currency_converter/internal/mails"
+	"github.com/skobelina/currency_converter/internal/rates"
 
-	"github.com/skobelina/currency_converter/domains/subscribers"
+	"github.com/skobelina/currency_converter/internal/subscribers"
 
 	"gorm.io/gorm"
 )

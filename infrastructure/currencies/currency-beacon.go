@@ -8,7 +8,7 @@ import (
 	"time"
 
 	"github.com/sirupsen/logrus"
-	"github.com/skobelina/currency_converter/constants"
+	"github.com/skobelina/currency_converter/internal/constants"
 )
 
 type ProviderCurrencyBeacon struct {

@@ -5,7 +5,7 @@ import (
 	"io"
 	"net/http"
 
-	errors "github.com/skobelina/currency_converter/utils/errors"
+	errors "github.com/skobelina/currency_converter/pkg/utils/errors"
 )
 
 // swagger:model message
