@@ -3,7 +3,7 @@ package rest
 import (
 	"net/http"
 
-	"github.com/skobelina/currency_converter/utils/serializer"
+	"github.com/skobelina/currency_converter/pkg/utils/serializer"
 )
 
 func ErrorHandler(h func(w http.ResponseWriter, r *http.Request) error, middlewares ...func(w http.ResponseWriter, r *http.Request) error) http.HandlerFunc {

@@ -5,10 +5,10 @@ import (
 
 	"github.com/gorilla/mux"
 
-	"github.com/skobelina/currency_converter/domains"
-	errors "github.com/skobelina/currency_converter/utils/errors"
-	"github.com/skobelina/currency_converter/utils/rest"
-	"github.com/skobelina/currency_converter/utils/serializer"
+	domains "github.com/skobelina/currency_converter/internal"
+	errors "github.com/skobelina/currency_converter/pkg/utils/errors"
+	"github.com/skobelina/currency_converter/pkg/utils/rest"
+	"github.com/skobelina/currency_converter/pkg/utils/serializer"
 )
 
 type SubscriberServiceInterface interface {

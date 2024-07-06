@@ -1,9 +1,9 @@
 package subscribers
 
 import (
-	"github.com/skobelina/currency_converter/constants"
-	"github.com/skobelina/currency_converter/domains"
-	errors "github.com/skobelina/currency_converter/utils/errors"
+	domains "github.com/skobelina/currency_converter/internal"
+	"github.com/skobelina/currency_converter/internal/constants"
+	errors "github.com/skobelina/currency_converter/pkg/utils/errors"
 	"gorm.io/gorm"
 )
 

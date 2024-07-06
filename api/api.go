@@ -10,9 +10,9 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/sirupsen/logrus"
 
-	cronJobs "github.com/skobelina/currency_converter/domains/cron-jobs"
-	"github.com/skobelina/currency_converter/domains/rates"
-	"github.com/skobelina/currency_converter/domains/subscribers"
+	cronJobs "github.com/skobelina/currency_converter/internal/cron-jobs"
+	"github.com/skobelina/currency_converter/internal/rates"
+	"github.com/skobelina/currency_converter/internal/subscribers"
 )
 
 var (

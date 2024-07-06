@@ -3,8 +3,8 @@ package subscribers
 import (
 	"strings"
 
-	"github.com/skobelina/currency_converter/domains"
-	errors "github.com/skobelina/currency_converter/utils/errors"
+	domains "github.com/skobelina/currency_converter/internal"
+	errors "github.com/skobelina/currency_converter/pkg/utils/errors"
 )
 
 type Subscriber struct {

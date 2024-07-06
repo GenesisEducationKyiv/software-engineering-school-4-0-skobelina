@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/skobelina/currency_converter/constants"
+	"github.com/skobelina/currency_converter/internal/constants"
 )
 
 type Filter struct {
