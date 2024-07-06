@@ -14,18 +14,24 @@ func TestArchitecture(t *testing.T) {
 				Package: "api",
 				ShouldOnlyDependsOn: &config.Dependencies{
 					Internal: []string{
-						"domains",
-						"utils",
-						"repo",
+						"internal/cron-jobs",
+						"internal/mails",
+						"internal/rates",
+						"internal/subscribers",
+						"pkg/utils",
+						"pkg/repo",
 					},
 				},
 			},
 			{
-				Package: "constants",
+				Package: "internal/constants",
 				ShouldOnlyDependsOn: &config.Dependencies{
 					Internal: []string{
-						"domains",
-						"utils",
+						"internal/cron-jobs",
+						"internal/mails",
+						"internal/rates",
+						"internal/subscribers",
+						"pkg/utils",
 					},
 				},
 			},
@@ -33,52 +39,57 @@ func TestArchitecture(t *testing.T) {
 				Package: "docs",
 				ShouldOnlyDependsOn: &config.Dependencies{
 					Internal: []string{
-						"domains",
+						"internal/cron-jobs",
+						"internal/mails",
+						"internal/rates",
+						"internal/subscribers",
 					},
 				},
 			},
 			{
-				Package: "domains/cron-jobs",
+				Package: "internal/cron-jobs",
 				ShouldOnlyDependsOn: &config.Dependencies{
 					Internal: []string{
-						"domains",
-						"utils",
-						"domains/mails",
-						"domains/rates",
-						"domains/subscribers",
+						"internal/cron-jobs",
+						"pkg/utils",
+						"internal/mails",
+						"internal/rates",
+						"internal/subscribers",
+						"internal",
 					},
 				},
 			},
 			{
-				Package: "domains/mails",
+				Package: "internal/mails",
 				ShouldOnlyDependsOn: &config.Dependencies{
 					Internal: []string{
-						"domains",
-						"utils",
+						"internal/cron-jobs",
+						"pkg/utils",
 					},
 				},
 			},
 			{
-				Package: "domains/rates",
+				Package: "internal/rates",
 				ShouldOnlyDependsOn: &config.Dependencies{
 					Internal: []string{
-						"domains",
-						"utils",
+						"internal/cron-jobs",
+						"pkg/utils",
 					},
 				},
 			},
 			{
-				Package: "domains/subscribers",
+				Package: "internal/subscribers",
 				ShouldOnlyDependsOn: &config.Dependencies{
 					Internal: []string{
-						"domains",
-						"utils",
-						"constants",
+						"internal/cron-jobs",
+						"pkg/utils",
+						"internal/constants",
+						"internal",
 					},
 				},
 			},
 			{
-				Package: "domains",
+				Package: "internal/cron-jobs",
 				ShouldNotDependsOn: &config.Dependencies{
 					Internal: []string{
 						"api",
@@ -86,19 +97,19 @@ func TestArchitecture(t *testing.T) {
 				},
 			},
 			{
-				Package: "repo",
+				Package: "pkg/repo",
 				ShouldOnlyDependsOn: &config.Dependencies{
 					Internal: []string{
-						"utils",
+						"pkg/utils",
 					},
 				},
 			},
 			{
-				Package: "utils",
+				Package: "pkg/utils",
 				ShouldNotDependsOn: &config.Dependencies{
 					Internal: []string{
 						"api",
-						"domains",
+						"internal/cron-jobs",
 					},
 				},
 			},
