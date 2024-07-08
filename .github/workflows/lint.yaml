@@ -27,8 +27,11 @@ jobs:
       - name: install golangci-lint
         run: go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
 
-      - name: go mod tidy and download
+      - name: go work init and download
         run: |
+          echo 'go 1.22.4' > go.work
+          echo 'use .' >> go.work
+          echo 'use ./email_sender' >> go.work
           go mod tidy
           go mod download
 
@@ -78,8 +81,11 @@ jobs:
       - name: install gosec
         run: go install github.com/securego/gosec/v2/cmd/gosec@latest
 
-      - name: go mod tidy and download
+      - name: go work init and download
         run: |
+          echo 'go 1.22.4' > go.work
+          echo 'use .' >> go.work
+          echo 'use ./email_sender' >> go.work
           go mod tidy
           go mod download
 
@@ -129,8 +135,11 @@ jobs:
       - name: install arch-go
         run: go install github.com/fdaines/arch-go@latest
 
-      - name: go mod tidy and download
+      - name: go work init and download
         run: |
+          echo 'go 1.22.4' > go.work
+          echo 'use .' >> go.work
+          echo 'use ./email_sender' >> go.work
           go mod tidy
           go mod download
 
