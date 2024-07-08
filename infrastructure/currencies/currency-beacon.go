@@ -48,7 +48,11 @@ func (p *ProviderCurrencyBeacon) Handle() (float64, error) {
 		logrus.Errorf("ProviderCurrencyBeacon - Failed to perform request: %v", err)
 		return p.BaseHandler.Handle()
 	}
-	defer resp.Body.Close()
+	defer func() {
+		if err := resp.Body.Close(); err != nil {
+			logrus.Errorf("Error closing response body: %v", err)
+		}
+	}()
 
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
