@@ -42,9 +42,6 @@ jobs:
           go mod download
           cd ..
 
-      - name: set GOPATH for email_sender
-        run: echo "GOPATH=$(go env GOPATH):$(pwd)/email_sender" >> $GITHUB_ENV
-
       - name: run golangci-lint for main project
         run: golangci-lint run ./...
 
@@ -52,10 +49,10 @@ jobs:
         run: cd email_sender && golangci-lint run ./...
 
       - name: run gosec for main project
-        run: "`go env GOPATH`/bin/gosec ./..."
+        run: /home/runner/go/bin/gosec ./...
 
       - name: run gosec for email_sender
-        run: cd email_sender && "`go env GOPATH`/bin/gosec ./..."
+        run: cd email_sender && /home/runner/go/bin/gosec ./...
 
       - name: run arch-go
         run: arch-go
