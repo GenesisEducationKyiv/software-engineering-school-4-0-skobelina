@@ -2,9 +2,9 @@ package api
 
 import (
 	"github.com/sirupsen/logrus"
-	"github.com/skobelina/currency_converter/internal/mails"
 	"github.com/skobelina/currency_converter/internal/rates"
 	"github.com/skobelina/currency_converter/internal/subscribers"
+	"github.com/skobelina/currency_converter/pkg/queue"
 	"github.com/skobelina/currency_converter/pkg/repo"
 	"gorm.io/gorm"
 )
@@ -13,7 +13,7 @@ type dependencies struct {
 	Repo          *gorm.DB
 	Rates         *rates.RateService
 	Subscribers   *subscribers.SubscriberService
-	MailService   *mails.MailService
+	RabbitMQ      *queue.RabbitMQ
 	currencyRates *float64
 }
 
@@ -28,7 +28,10 @@ func registerDependencies() *dependencies {
 	subscriberRepo := subscribers.NewRepository(repo)
 	rates := rates.NewService(repo)
 	subscribers := subscribers.NewService(subscriberRepo)
-	mailService := mails.NewService(mails.DefaultMailSendAddress, mails.DefaultMailHost)
+	rabbitMQ, err := queue.NewRabbitMQ(rabbitMQURL, "events")
+	if err != nil {
+		logrus.Infof("failed to connect to RabbitMQ: %v", err)
+	}
 	currencyRates, err := rates.Get()
 	if err != nil {
 		logrus.Infof("cannot preload currency rates: %v\n", err)
@@ -37,7 +40,7 @@ func registerDependencies() *dependencies {
 		Repo:          repo,
 		Rates:         rates,
 		Subscribers:   subscribers,
-		MailService:   mailService,
+		RabbitMQ:      rabbitMQ,
 		currencyRates: currencyRates,
 	}
 }

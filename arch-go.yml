@@ -7,16 +7,15 @@ dependenciesRules:
     shouldOnlyDependsOn:
       internal:
         - "internal/cron-jobs"
-        - "internal/mails"
         - "internal/rates"
         - "internal/subscribers"
         - "pkg/utils"
         - "pkg/repo"
+        - "pkg/queue"
   - package: "internal/constants"
     shouldOnlyDependsOn:
       internal:
         - "internal/cron-jobs"
-        - "internal/mails"
         - "internal/rates"
         - "internal/subscribers"
         - "pkg/utils"
@@ -24,7 +23,6 @@ dependenciesRules:
     shouldOnlyDependsOn:
       internal:
         - "internal/cron-jobs"
-        - "internal/mails"
         - "internal/rates"
         - "internal/subscribers"
   - package: "internal/cron-jobs"
@@ -32,15 +30,10 @@ dependenciesRules:
       internal:
         - "internal/cron-jobs"
         - "pkg/utils"
-        - "internal/mails"
         - "internal/rates"
         - "internal/subscribers"
         - "internal"
-  - package: "internal/mails"
-    shouldOnlyDependsOn:
-      internal:
-        - "internal/cron-jobs"
-        - "pkg/utils"
+        - "pkg/queue"
   - package: "internal/rates"
     shouldOnlyDependsOn:
       internal:

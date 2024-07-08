@@ -2,8 +2,8 @@ package cronjobs
 
 import (
 	"github.com/sirupsen/logrus"
-	"github.com/skobelina/currency_converter/internal/mails"
 	"github.com/skobelina/currency_converter/internal/rates"
+	"github.com/skobelina/currency_converter/pkg/queue"
 
 	"github.com/skobelina/currency_converter/internal/subscribers"
 
@@ -12,17 +12,17 @@ import (
 
 type CronJobService struct {
 	repo        *gorm.DB
-	mail        mails.MailServiceInterface
 	rates       rates.RateServiceInterface
 	subscribers subscribers.SubscriberServiceInterface
+	rabbitMQ    *queue.RabbitMQ
 }
 
-func NewService(repo *gorm.DB, mail mails.MailServiceInterface, rates rates.RateServiceInterface, subscribers subscribers.SubscriberServiceInterface) *CronJobService {
+func NewService(repo *gorm.DB, rates rates.RateServiceInterface, subscribers subscribers.SubscriberServiceInterface, rabbitMQ *queue.RabbitMQ) *CronJobService {
 	return &CronJobService{
 		repo:        repo,
-		mail:        mail,
 		rates:       rates,
 		subscribers: subscribers,
+		rabbitMQ:    rabbitMQ,
 	}
 }
 

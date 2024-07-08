@@ -17,6 +17,7 @@ import (
 
 var (
 	databaseURL = os.Getenv("DATABASE_URL")
+	rabbitMQURL = os.Getenv("RABBITMQ_URL")
 )
 
 type Api interface {
@@ -32,7 +33,7 @@ func New() Api {
 	r := mux.NewRouter()
 	rates.NewHandler(deps.Rates).Register(r)
 	subscribers.NewHandler(deps.Subscribers).Register(r)
-	cronJobService := cronJobs.NewService(deps.Repo, deps.MailService, deps.Rates, deps.Subscribers)
+	cronJobService := cronJobs.NewService(deps.Repo, deps.Rates, deps.Subscribers, deps.RabbitMQ)
 	cronJobs.NewHandler(cronJobService).Register(r)
 
 	r.Use(
