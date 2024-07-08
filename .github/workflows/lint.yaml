@@ -27,14 +27,20 @@ jobs:
       - name: install golangci-lint
         run: go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
 
-      - name: run golangci-lint
-        run: golangci-lint run
+      - name: run golangci-lint for main project
+        run: golangci-lint run ./...
+
+      - name: run golangci-lint for email_sender
+        run: cd email_sender && golangci-lint run ./...
 
       - name: install gosec
         run: go install github.com/securego/gosec/v2/cmd/gosec@latest
 
-      - name: run gosec
+      - name: run gosec for main project
         run: "`go env GOPATH`/bin/gosec ./..."
+
+      - name: run gosec for email_sender
+        run: cd email_sender && "`go env GOPATH`/bin/gosec ./..."
 
       - name: install arch-go
         run: go install github.com/fdaines/arch-go@latest
