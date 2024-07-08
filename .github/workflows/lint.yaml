@@ -27,6 +27,16 @@ jobs:
       - name: install golangci-lint
         run: go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
 
+      - name: run go mod tidy
+        run: |
+          cd email_sender
+          go mod tidy
+
+      - name: run go mod download
+        run: |
+          cd email_sender
+          go mod download
+
       - name: run golangci-lint for main project
         run: golangci-lint run ./...
 
