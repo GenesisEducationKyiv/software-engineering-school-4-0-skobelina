@@ -30,6 +30,9 @@ jobs:
       - name: install gosec
         run: go install github.com/securego/gosec/v2/cmd/gosec@latest
 
+      - name: install arch-go
+        run: go install github.com/fdaines/arch-go@latest
+
       - name: go mod tidy and download for all projects
         run: |
           go mod tidy
@@ -38,6 +41,9 @@ jobs:
           go mod tidy
           go mod download
           cd ..
+
+      - name: set GOPATH for email_sender
+        run: echo "GOPATH=$(go env GOPATH):$(pwd)/email_sender" >> $GITHUB_ENV
 
       - name: run golangci-lint for main project
         run: golangci-lint run ./...
@@ -50,9 +56,6 @@ jobs:
 
       - name: run gosec for email_sender
         run: cd email_sender && "`go env GOPATH`/bin/gosec ./..."
-
-      - name: install arch-go
-        run: go install github.com/fdaines/arch-go@latest
 
       - name: run arch-go
         run: arch-go
