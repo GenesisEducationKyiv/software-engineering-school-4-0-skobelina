@@ -1,6 +1,6 @@
 package currencies
 
-import errors "github.com/skobelina/currency_converter/pkg/utils/errors"
+import errors "github.com/skobelina/currency_converter/pkg/errors"
 
 type CurrencyHandler interface {
 	SetNext(handler CurrencyHandler)

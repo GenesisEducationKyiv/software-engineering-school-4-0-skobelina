@@ -4,7 +4,7 @@ import (
 	"strings"
 
 	domains "github.com/skobelina/currency_converter/internal"
-	errors "github.com/skobelina/currency_converter/pkg/utils/errors"
+	errors "github.com/skobelina/currency_converter/pkg/errors"
 )
 
 type Subscriber struct {
