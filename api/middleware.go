@@ -4,7 +4,7 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
-	"github.com/skobelina/currency_converter/utils/serializer"
+	"github.com/skobelina/currency_converter/pkg/utils/serializer"
 )
 
 func OptionsHandler() mux.MiddlewareFunc {
