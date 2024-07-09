@@ -1,11 +1,7 @@
 version: 1
 threshold:
   compliance: 100
-<<<<<<< HEAD
   coverage: 60
-=======
-  coverage: 80
->>>>>>> 0d37fbb620cec52a62639c07d9637d7b57f342d1
 dependenciesRules:
   - package: "api"
     shouldOnlyDependsOn:
@@ -40,10 +36,7 @@ dependenciesRules:
         - "internal/rates"
         - "internal/subscribers"
         - "internal"
-<<<<<<< HEAD
-=======
         - "pkg/errors"
->>>>>>> 0d37fbb620cec52a62639c07d9637d7b57f342d1
   - package: "internal/mails"
     shouldOnlyDependsOn:
       internal:
@@ -53,13 +46,9 @@ dependenciesRules:
     shouldOnlyDependsOn:
       internal:
         - "internal/cron-jobs"
-<<<<<<< HEAD
         - "infrastructure/currencies"
         - "pkg/utils"
-=======
-        - "pkg/utils"
         - "pkg/errors"
->>>>>>> 0d37fbb620cec52a62639c07d9637d7b57f342d1
   - package: "internal/subscribers"
     shouldOnlyDependsOn:
       internal:
@@ -67,10 +56,7 @@ dependenciesRules:
         - "pkg/utils"
         - "internal/constants"
         - "internal"
-<<<<<<< HEAD
-=======
         - "pkg/errors"
->>>>>>> 0d37fbb620cec52a62639c07d9637d7b57f342d1
   - package: "internal/cron-jobs"
     shouldNotDependsOn:
       internal:
@@ -84,14 +70,11 @@ dependenciesRules:
       internal:
         - "api"
         - "internal/cron-jobs"
-<<<<<<< HEAD
   - package: "infrastructure/currencies"
     shouldNotDependsOn:
       internal:
         - "api"
         - "internal/cron-jobs"
-=======
->>>>>>> 0d37fbb620cec52a62639c07d9637d7b57f342d1
 
 contentsRules:
   - package: "README.md"
@@ -99,8 +82,4 @@ contentsRules:
 
 namingRules:
   - package: "internal"
-<<<<<<< HEAD
     shouldFollowConvention: "camelCase"
-=======
-    shouldFollowConvention: "camelCase"
->>>>>>> 0d37fbb620cec52a62639c07d9637d7b57f342d1
