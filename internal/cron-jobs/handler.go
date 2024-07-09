@@ -4,7 +4,7 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
-	errors "github.com/skobelina/currency_converter/pkg/utils/errors"
+	errors "github.com/skobelina/currency_converter/pkg/errors"
 	"github.com/skobelina/currency_converter/pkg/utils/rest"
 	"github.com/skobelina/currency_converter/pkg/utils/serializer"
 )
