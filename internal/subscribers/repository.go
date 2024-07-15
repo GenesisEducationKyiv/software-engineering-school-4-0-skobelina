@@ -8,6 +8,7 @@ type Repository interface {
 	Create(subscriber *Subscriber) error
 	FindByEmail(email string) (*Subscriber, error)
 	Search(filter *SearchSubscribeRequest) ([]Subscriber, int64, error)
+	Delete(subscriber *Subscriber) error
 }
 
 type repository struct {
@@ -42,4 +43,8 @@ func (r *repository) Search(filter *SearchSubscribeRequest) ([]Subscriber, int64
 		return nil, 0, err
 	}
 	return subscribers, count, nil
+}
+
+func (r *repository) Delete(subscriber *Subscriber) error {
+	return r.db.Delete(subscriber).Error
 }

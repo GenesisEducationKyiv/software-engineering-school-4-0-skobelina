@@ -29,6 +29,13 @@ type CreateSubscribe struct {
 	Body SubscriberRequest
 }
 
+// swagger:parameters deleteSubscribe
+type DeleteSubscribe struct {
+	// in: body
+	// required: true
+	Body SubscriberRequest
+}
+
 // swagger:parameters searchSubscribe
 type SearchSubscribeRequest struct {
 	domains.Filter

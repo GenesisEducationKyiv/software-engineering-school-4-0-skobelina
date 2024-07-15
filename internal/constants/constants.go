@@ -3,7 +3,8 @@ package constants
 // STATUSES
 
 const (
-	StatusAdded = "e-mail added"
+	StatusAdded   = "e-mail added"
+	StatusDeleted = "e-mail deleted"
 )
 
 const (

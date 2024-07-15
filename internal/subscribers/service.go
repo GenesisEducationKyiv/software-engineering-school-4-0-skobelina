@@ -64,3 +64,20 @@ func (s *SubscriberService) Search(filter *SearchSubscribeRequest) (*SearchSubsc
 		},
 	}, nil
 }
+
+func (s *SubscriberService) Delete(request *SubscriberRequest) (*string, error) {
+	subscriber, err := s.repo.FindByEmail(request.Email)
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, errors.NewItemNotFoundErrorf("subscriber not found")
+		}
+		return nil, errors.NewInternalServerErrorf("failed to find subscriber: %v", err)
+	}
+
+	if err := s.repo.Delete(subscriber); err != nil {
+		return nil, errors.NewInternalServerErrorf("failed to delete subscriber: %v", err)
+	}
+
+	status := constants.StatusDeleted
+	return &status, nil
+}
