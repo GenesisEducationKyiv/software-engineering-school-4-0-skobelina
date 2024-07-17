@@ -26,19 +26,18 @@ type CurrencyData struct {
 	Rates map[string]float64
 }
 
-func (p *ProviderExchangeRates) Handle() (float64, error) {
-	var config configs.Config
+func (p *ProviderExchangeRates) Handle(config *configs.Config) (float64, error) {
 	var myClient = &http.Client{Timeout: 10 * time.Second}
 	req, err := http.NewRequest("GET", config.AppCurrencyBeaconURL, nil)
 	if err != nil {
 		logrus.Errorf("ProviderExchangeRates - Failed to create request: %v", err)
-		return p.BaseHandler.Handle()
+		return p.BaseHandler.Handle(config)
 	}
 	req.Header.Add("apikey", config.AppCurrencyExchangeKey)
 	resp, err := myClient.Do(req)
 	if err != nil {
 		logrus.Errorf("ProviderExchangeRates - Failed to perform request: %v", err)
-		return p.BaseHandler.Handle()
+		return p.BaseHandler.Handle(config)
 	}
 	defer func() {
 		if err := resp.Body.Close(); err != nil {
@@ -49,26 +48,26 @@ func (p *ProviderExchangeRates) Handle() (float64, error) {
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		logrus.Errorf("ProviderExchangeRates - Failed to read response body: %v", err)
-		return p.BaseHandler.Handle()
+		return p.BaseHandler.Handle(config)
 	}
 
 	if resp.StatusCode != http.StatusOK {
 		logrus.Errorf("ProviderExchangeRates - Unexpected status code: %d", resp.StatusCode)
-		return p.BaseHandler.Handle()
+		return p.BaseHandler.Handle(config)
 	}
 
 	var data CurrencyData
 	if err := json.Unmarshal(body, &data); err != nil {
 		logrus.Errorf("ProviderExchangeRates - Failed to unmarshal response: %v", err)
 		logrus.Errorf("ProviderExchangeRates - Response body: %s", string(body))
-		return p.BaseHandler.Handle()
+		return p.BaseHandler.Handle(config)
 	}
 
 	usdRate, usdExists := data.Rates[constants.CurrencyUSD]
 	uahRate, uahExists := data.Rates[constants.CurrencyUAH]
 	if !usdExists || !uahExists {
 		logrus.Errorf("ProviderExchangeRates - USD or UAH rate not found")
-		return p.BaseHandler.Handle()
+		return p.BaseHandler.Handle(config)
 	}
 	return uahRate / usdRate, nil
 }

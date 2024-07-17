@@ -3,8 +3,6 @@ package api
 import (
 	"log"
 
-	"github.com/joho/godotenv"
-	"github.com/kelseyhightower/envconfig"
 	"github.com/sirupsen/logrus"
 	"github.com/skobelina/currency_converter/configs"
 	"github.com/skobelina/currency_converter/internal/rates"
@@ -23,13 +21,7 @@ type dependencies struct {
 }
 
 func registerDependencies() *dependencies {
-	err := godotenv.Load(".env")
-	if err != nil {
-		log.Fatal("Error loading .env file")
-	}
-
-	var config configs.Config
-	err = envconfig.Process("currency_converter", &config)
+	config, err := configs.LoadConfig(".env")
 	if err != nil {
 		log.Fatal(err.Error())
 	}
@@ -41,7 +33,7 @@ func registerDependencies() *dependencies {
 		logrus.Infof("failed to migrate database: %v", err)
 	}
 	subscriberRepo := subscribers.NewRepository(repo)
-	rates := rates.NewService(repo)
+	rates := rates.NewService(repo, config)
 	rabbitMQ, err := queue.NewRabbitMQ(config.RabbitMQURL, "events")
 	if err != nil {
 		logrus.Infof("failed to connect to RabbitMQ: %v", err)

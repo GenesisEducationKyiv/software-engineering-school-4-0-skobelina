@@ -3,8 +3,6 @@ package main
 import (
 	"log"
 
-	"github.com/joho/godotenv"
-	"github.com/kelseyhightower/envconfig"
 	"github.com/sirupsen/logrus"
 	"github.com/skobelina/email_sender/configs"
 	cronjobs "github.com/skobelina/email_sender/internal/cron-jobs"
@@ -14,13 +12,7 @@ import (
 )
 
 func main() {
-	err := godotenv.Load("email_sender/.env")
-	if err != nil {
-		log.Fatal("Error loading .env file")
-	}
-
-	var config configs.Config
-	err = envconfig.Process("email_sender", &config)
+	config, err := configs.LoadConfig(".env")
 	if err != nil {
 		log.Fatal(err.Error())
 	}
@@ -39,7 +31,7 @@ func main() {
 	defer rabbitMQ.Close()
 
 	subscriberRepo := cronjobs.NewRepository(repo)
-	mailService := mails.NewService(mails.DefaultMailSendAddress, mails.DefaultMailHost)
+	mailService := mails.NewService(mails.DefaultMailSendAddress, mails.DefaultMailHost, config)
 	cronJobService := cronjobs.NewCronJobService(mailService, rabbitMQ, subscriberRepo)
 	cronJobService.InitializeSubscribers()
 	logrus.Info("Starting email sender service")
