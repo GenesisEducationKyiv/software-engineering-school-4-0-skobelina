@@ -54,7 +54,7 @@ func TestHandler_Create_Success(t *testing.T) {
 	requestBody, err := json.Marshal(subscribers.SubscriberRequest{})
 	assert.NoError(t, err)
 
-	req, err := http.NewRequest("POST", "/api/subscribe", bytes.NewBuffer(requestBody))
+	req, err := http.NewRequest(http.MethodPost, "/api/subscribe", bytes.NewBuffer(requestBody))
 	assert.NoError(t, err)
 
 	rr := httptest.NewRecorder()
@@ -79,7 +79,7 @@ func TestHandler_Create_Conflict(t *testing.T) {
 	requestBody, err := json.Marshal(subscribers.SubscriberRequest{})
 	assert.NoError(t, err)
 
-	req, err := http.NewRequest("POST", "/api/subscribe", bytes.NewBuffer(requestBody))
+	req, err := http.NewRequest(http.MethodPost, "/api/subscribe", bytes.NewBuffer(requestBody))
 	assert.NoError(t, err)
 
 	rr := httptest.NewRecorder()
@@ -101,7 +101,7 @@ func TestHandler_Search_Success(t *testing.T) {
 	router := mux.NewRouter()
 	handler.Register(router)
 
-	req, err := http.NewRequest("GET", "/api/subscribe", nil)
+	req, err := http.NewRequest(http.MethodGet, "/api/subscribe", nil)
 	assert.NoError(t, err)
 
 	rr := httptest.NewRecorder()
@@ -123,7 +123,7 @@ func TestHandler_Search_BadRequest(t *testing.T) {
 	router := mux.NewRouter()
 	handler.Register(router)
 
-	req, err := http.NewRequest("GET", "/api/subscribe", nil)
+	req, err := http.NewRequest(http.MethodGet, "/api/subscribe", http.NoBody)
 	assert.NoError(t, err)
 
 	rr := httptest.NewRecorder()

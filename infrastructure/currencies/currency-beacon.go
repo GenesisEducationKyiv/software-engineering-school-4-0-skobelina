@@ -33,7 +33,7 @@ type CurrencyBeaconDataResponse struct {
 
 func (p *ProviderCurrencyBeacon) Handle(config *configs.Config) (float64, error) {
 	var myClient = &http.Client{Timeout: 10 * time.Second}
-	req, err := http.NewRequest("GET", config.AppCurrencyBeaconURL+"?api_key="+config.AppCurrencyBeaconKey+"&base=USD&symbols=UAH", nil)
+	req, err := http.NewRequest(http.MethodGet, config.AppCurrencyBeaconURL+"?api_key="+config.AppCurrencyBeaconKey+"&base=USD&symbols=UAH", http.NoBody)
 	if err != nil {
 		logrus.Errorf("ProviderCurrencyBeacon - Failed to create request: %v", err)
 		return p.BaseHandler.Handle(config)

@@ -34,7 +34,7 @@ func TestHandler_GetRate_Success(t *testing.T) {
 	router := mux.NewRouter()
 	handler.Register(router)
 
-	req, err := http.NewRequest("GET", "/api/rate", nil)
+	req, err := http.NewRequest(http.MethodGet, "/api/rate", http.NoBody)
 	assert.NoError(t, err)
 
 	rr := httptest.NewRecorder()
@@ -56,7 +56,7 @@ func TestHandler_GetRate_InternalServerError(t *testing.T) {
 	router := mux.NewRouter()
 	handler.Register(router)
 
-	req, err := http.NewRequest("GET", "/api/rate", nil)
+	req, err := http.NewRequest(http.MethodGet, "/api/rate", http.NoBody)
 	assert.NoError(t, err)
 
 	rr := httptest.NewRecorder()
@@ -77,7 +77,7 @@ func TestHandler_GetRate_BadRequest(t *testing.T) {
 	router := mux.NewRouter()
 	handler.Register(router)
 
-	req, err := http.NewRequest("GET", "/api/rate", nil)
+	req, err := http.NewRequest(http.MethodGet, "/api/rate", http.NoBody)
 	assert.NoError(t, err)
 
 	rr := httptest.NewRecorder()

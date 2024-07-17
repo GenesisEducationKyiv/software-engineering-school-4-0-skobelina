@@ -28,7 +28,7 @@ type CurrencyData struct {
 
 func (p *ProviderExchangeRates) Handle(config *configs.Config) (float64, error) {
 	var myClient = &http.Client{Timeout: 10 * time.Second}
-	req, err := http.NewRequest("GET", config.AppCurrencyBeaconURL, nil)
+	req, err := http.NewRequest(http.MethodGet, config.AppCurrencyBeaconURL, http.NoBody)
 	if err != nil {
 		logrus.Errorf("ProviderExchangeRates - Failed to create request: %v", err)
 		return p.BaseHandler.Handle(config)
