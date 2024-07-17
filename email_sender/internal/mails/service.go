@@ -1,10 +1,10 @@
 package mails
 
 import (
-	"os"
 	"time"
 
 	"github.com/sirupsen/logrus"
+	"github.com/skobelina/currency_converter/configs"
 	gomail "gopkg.in/gomail.v2"
 )
 
@@ -87,10 +87,11 @@ func prepare(messages ...*Message) []*gomail.Message {
 }
 
 func (s *MailService) scheduler() {
+	var config configs.Config
 	var sendCloser gomail.SendCloser
 	var err error
 
-	d := gomail.NewDialer(DefaultMailHost, DefaultMailPort, DefaultMailSendAddress, os.Getenv("MAILPASS"))
+	d := gomail.NewDialer(DefaultMailHost, DefaultMailPort, DefaultMailSendAddress, config.MailPass)
 	open := false
 
 	for {

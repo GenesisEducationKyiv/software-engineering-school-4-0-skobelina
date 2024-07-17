@@ -4,10 +4,10 @@ import (
 	"encoding/json"
 	"io"
 	"net/http"
-	"os"
 	"time"
 
 	"github.com/sirupsen/logrus"
+	"github.com/skobelina/currency_converter/configs"
 	"github.com/skobelina/currency_converter/internal/constants"
 )
 
@@ -31,14 +31,10 @@ type CurrencyBeaconDataResponse struct {
 	Rates map[string]float64 `json:"rates"`
 }
 
-var (
-	currencyBeaconApi = os.Getenv("APP_CURRENCY_BEACON_URL")
-	apiKeyBeacon      = os.Getenv("APP_CURRENCY_BEACON_KEY")
-)
-
 func (p *ProviderCurrencyBeacon) Handle() (float64, error) {
+	var config configs.Config
 	var myClient = &http.Client{Timeout: 10 * time.Second}
-	req, err := http.NewRequest("GET", currencyBeaconApi+"?api_key="+apiKeyBeacon+"&base=USD&symbols=UAH", nil)
+	req, err := http.NewRequest("GET", config.AppCurrencyBeaconURL+"?api_key="+config.AppCurrencyBeaconKey+"&base=USD&symbols=UAH", nil)
 	if err != nil {
 		logrus.Errorf("ProviderCurrencyBeacon - Failed to create request: %v", err)
 		return p.BaseHandler.Handle()

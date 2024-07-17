@@ -4,10 +4,10 @@ import (
 	"encoding/json"
 	"io"
 	"net/http"
-	"os"
 	"time"
 
 	"github.com/sirupsen/logrus"
+	"github.com/skobelina/currency_converter/configs"
 	"github.com/skobelina/currency_converter/internal/constants"
 )
 
@@ -26,19 +26,15 @@ type CurrencyData struct {
 	Rates map[string]float64
 }
 
-var (
-	currencyExchangeApi = os.Getenv("APP_CURRENCY_EXCHANGE_URL")
-	apiKey              = os.Getenv("APP_CURRENCY_EXCHANGE_KEY")
-)
-
 func (p *ProviderExchangeRates) Handle() (float64, error) {
+	var config configs.Config
 	var myClient = &http.Client{Timeout: 10 * time.Second}
-	req, err := http.NewRequest("GET", currencyExchangeApi, nil)
+	req, err := http.NewRequest("GET", config.AppCurrencyBeaconURL, nil)
 	if err != nil {
 		logrus.Errorf("ProviderExchangeRates - Failed to create request: %v", err)
 		return p.BaseHandler.Handle()
 	}
-	req.Header.Add("apikey", apiKey)
+	req.Header.Add("apikey", config.AppCurrencyExchangeKey)
 	resp, err := myClient.Do(req)
 	if err != nil {
 		logrus.Errorf("ProviderExchangeRates - Failed to perform request: %v", err)

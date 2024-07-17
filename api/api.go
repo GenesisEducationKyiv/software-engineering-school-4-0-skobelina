@@ -15,11 +15,6 @@ import (
 	"github.com/skobelina/currency_converter/internal/subscribers"
 )
 
-var (
-	databaseURL = os.Getenv("DATABASE_URL")
-	rabbitMQURL = os.Getenv("RABBITMQ_URL")
-)
-
 type Api interface {
 	Handle() error
 }
