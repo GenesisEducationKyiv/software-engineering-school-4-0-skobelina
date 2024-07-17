@@ -6,7 +6,7 @@ import (
 	"github.com/gorilla/mux"
 
 	domains "github.com/skobelina/currency_converter/internal"
-	errors "github.com/skobelina/currency_converter/pkg/utils/errors"
+	errors "github.com/skobelina/currency_converter/pkg/errors"
 	"github.com/skobelina/currency_converter/pkg/utils/rest"
 	"github.com/skobelina/currency_converter/pkg/utils/serializer"
 )

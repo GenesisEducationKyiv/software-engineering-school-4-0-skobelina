@@ -90,58 +90,10 @@ jobs:
           go mod download
 
       - name: run gosec
-        run: /home/runner/go/bin/gosec ./...
-
-  gosec-email-sender:
-    name: gosec for email_sender
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: checkout code
-        uses: actions/checkout@v4
-
-      - name: set up go
-        uses: actions/setup-go@v4
-        with:
-          go-version: 1.22.4
-
-      - name: install gosec
-        run: go install github.com/securego/gosec/v2/cmd/gosec@latest
-
-      - name: go mod tidy and download for email_sender
-        run: |
-          cd email_sender
-          go mod tidy
-          go mod download
-
-      - name: run gosec for email_sender
-        run: |
-          cd email_sender
-          /home/runner/go/bin/gosec ./...
-
-  arch-go:
-    name: arch-go for architectural tests
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: checkout code
-        uses: actions/checkout@v4
-
-      - name: set up go
-        uses: actions/setup-go@v4
-        with:
-          go-version: 1.22.4
+        run: "`go env GOPATH`/bin/gosec ./..."
 
       - name: install arch-go
         run: go install github.com/fdaines/arch-go@latest
-
-      - name: go work init and download
-        run: |
-          echo 'go 1.22.4' > go.work
-          echo 'use .' >> go.work
-          echo 'use ./email_sender' >> go.work
-          go mod tidy
-          go mod download
 
       - name: run arch-go
         run: arch-go

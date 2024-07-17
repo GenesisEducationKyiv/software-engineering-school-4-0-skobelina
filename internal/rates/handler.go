@@ -6,7 +6,7 @@ import (
 	"github.com/gorilla/mux"
 	"gorm.io/gorm"
 
-	utils "github.com/skobelina/currency_converter/pkg/utils/errors"
+	utils "github.com/skobelina/currency_converter/pkg/errors"
 	"github.com/skobelina/currency_converter/pkg/utils/rest"
 	"github.com/skobelina/currency_converter/pkg/utils/serializer"
 )
