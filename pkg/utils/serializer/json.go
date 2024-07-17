@@ -161,14 +161,9 @@ func SendJSON(w http.ResponseWriter, status int, object interface{}) error {
 	// set headers
 	SetCorsHeaders(w)
 	w.Header().Set("Content-Type", "application/json")
-	// write response
-	b, err := json.Marshal(object)
-	if err != nil {
-		return err
-	}
 	w.WriteHeader(status)
-	_, err = w.Write(b)
-	if err != nil {
+	// write response
+	if err := json.NewEncoder(w).Encode(object); err != nil {
 		return err
 	}
 	return nil
