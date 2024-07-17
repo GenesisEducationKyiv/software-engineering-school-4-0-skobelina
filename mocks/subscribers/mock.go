@@ -8,6 +8,7 @@ import (
 	reflect "reflect"
 
 	gomock "github.com/golang/mock/gomock"
+	subscribers "github.com/skobelina/currency_converter/internal/subscribers"
 )
 
 // MockSubscriberServiceInterface is a mock of SubscriberServiceInterface interface.
@@ -34,7 +35,7 @@ func (m *MockSubscriberServiceInterface) EXPECT() *MockSubscriberServiceInterfac
 }
 
 // Create mocks base method.
-func (m *MockSubscriberServiceInterface) Create(request *SubscriberRequest) (*string, error) {
+func (m *MockSubscriberServiceInterface) Create(request *subscribers.SubscriberRequest) (*string, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Create", request)
 	ret0, _ := ret[0].(*string)
@@ -49,10 +50,10 @@ func (mr *MockSubscriberServiceInterfaceMockRecorder) Create(request interface{}
 }
 
 // Search mocks base method.
-func (m *MockSubscriberServiceInterface) Search(filter *SearchSubscribeRequest) (*SearchSubscribeResponse, error) {
+func (m *MockSubscriberServiceInterface) Search(filter *subscribers.SearchSubscribeRequest) (*subscribers.SearchSubscribeResponse, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Search", filter)
-	ret0, _ := ret[0].(*SearchSubscribeResponse)
+	ret0, _ := ret[0].(*subscribers.SearchSubscribeResponse)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }

@@ -1,8 +1,8 @@
 package rates
 
 import (
+	"github.com/skobelina/currency_converter/infrastructure/currencies"
 	errors "github.com/skobelina/currency_converter/pkg/errors"
-	"github.com/skobelina/currency_converter/pkg/utils/currencies"
 	"gorm.io/gorm"
 )
 

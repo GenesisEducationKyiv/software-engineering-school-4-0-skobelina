@@ -7,9 +7,10 @@ import (
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/golang/mock/gomock"
 	cronjobs "github.com/skobelina/currency_converter/internal/cron-jobs"
-	"github.com/skobelina/currency_converter/internal/mails"
-	"github.com/skobelina/currency_converter/internal/rates"
-	"github.com/skobelina/currency_converter/internal/subscribers"
+	subscriber "github.com/skobelina/currency_converter/internal/subscribers"
+	"github.com/skobelina/currency_converter/mocks/mails"
+	"github.com/skobelina/currency_converter/mocks/rates"
+	"github.com/skobelina/currency_converter/mocks/subscribers"
 	"github.com/skobelina/currency_converter/pkg/repo"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -42,8 +43,8 @@ func TestNotificationExchangeRates_Success(t *testing.T) {
 	mockRate := 27.32
 	mockRateService.EXPECT().Get().Return(&mockRate, nil)
 
-	mockSubscribers := &subscribers.SearchSubscribeResponse{
-		Data: []subscribers.Subscriber{
+	mockSubscribers := &subscriber.SearchSubscribeResponse{
+		Data: []subscriber.Subscriber{
 			{Email: "test1@example.com"},
 			{Email: "test2@example.com"},
 		},
@@ -72,7 +73,7 @@ func TestNotificationExchangeRates_Error(t *testing.T) {
 	mockRateService := rates.NewMockRateServiceInterface(ctrl)
 	mockSubscriberService := subscribers.NewMockSubscriberServiceInterface(ctrl)
 	mockRateService.EXPECT().Get().Return(nil, errors.New("internal server error"))
-	mockSubscriberService.EXPECT().Search(gomock.Any()).Return(&subscribers.SearchSubscribeResponse{}, nil)
+	mockSubscriberService.EXPECT().Search(gomock.Any()).Return(&subscriber.SearchSubscribeResponse{}, nil)
 	cronJobService := cronjobs.NewService(db, mockMailService, mockRateService, mockSubscriberService)
 	err := cronJobService.NotificationExchangeRates()
 	assert.Error(t, err)

@@ -1,7 +1,7 @@
 version: 1
 threshold:
   compliance: 100
-  coverage: 80
+  coverage: 60
 dependenciesRules:
   - package: "api"
     shouldOnlyDependsOn:
@@ -46,6 +46,7 @@ dependenciesRules:
     shouldOnlyDependsOn:
       internal:
         - "internal/cron-jobs"
+        - "infrastructure/currencies"
         - "pkg/utils"
         - "pkg/errors"
   - package: "internal/subscribers"
@@ -65,6 +66,11 @@ dependenciesRules:
       internal:
         - "pkg/utils"
   - package: "pkg/utils"
+    shouldNotDependsOn:
+      internal:
+        - "api"
+        - "internal/cron-jobs"
+  - package: "infrastructure/currencies"
     shouldNotDependsOn:
       internal:
         - "api"

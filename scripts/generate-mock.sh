@@ -8,4 +8,3 @@ go install github.com/golang/mock/mockgen
 ~/go/bin/mockgen -package=mails -self_package=github.com/skobelina/currency_converter/internal/mails -source=./internal/mails/service.go -mock_names Service=MockSubscriberService -destination=./internal/mails/mock.go
 
 go mod tidy
-

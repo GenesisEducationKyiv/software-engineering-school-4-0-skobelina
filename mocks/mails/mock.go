@@ -8,6 +8,7 @@ import (
 	reflect "reflect"
 
 	gomock "github.com/golang/mock/gomock"
+	mails "github.com/skobelina/currency_converter/internal/mails"
 )
 
 // MockMailServiceInterface is a mock of MailServiceInterface interface.
@@ -34,7 +35,7 @@ func (m *MockMailServiceInterface) EXPECT() *MockMailServiceInterfaceMockRecorde
 }
 
 // SendBatch mocks base method.
-func (m *MockMailServiceInterface) SendBatch(messages ...*Message) error {
+func (m *MockMailServiceInterface) SendBatch(messages ...*mails.Message) error {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{}
 	for _, a := range messages {
@@ -52,7 +53,7 @@ func (mr *MockMailServiceInterfaceMockRecorder) SendBatch(messages ...interface{
 }
 
 // SendEmail mocks base method.
-func (m *MockMailServiceInterface) SendEmail(recipients []string, subject string, temp Template) error {
+func (m *MockMailServiceInterface) SendEmail(recipients []string, subject string, temp mails.Template) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "SendEmail", recipients, subject, temp)
 	ret0, _ := ret[0].(error)
