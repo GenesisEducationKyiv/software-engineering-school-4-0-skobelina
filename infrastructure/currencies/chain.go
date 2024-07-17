@@ -1,6 +1,6 @@
 package currencies
 
-import errors "github.com/skobelina/currency_converter/pkg/utils/errors"
+import "github.com/skobelina/currency_converter/pkg/utils/serializer"
 
 type CurrencyHandler interface {
 	SetNext(handler CurrencyHandler)
@@ -19,5 +19,5 @@ func (b *BaseHandler) Handle() (float64, error) {
 	if b.next != nil {
 		return b.next.Handle()
 	}
-	return 0, errors.NewBadRequestError("no handler could handle the request")
+	return 0, serializer.NewBadRequestError("no handler could handle the request")
 }

@@ -13,6 +13,8 @@ const (
 
 	OrderASC  = "asc"
 	OrderDESC = "desc"
+
+	DateFormatYMD = "2006-01-02"
 )
 const (
 	CurrencyUSD = "USD"

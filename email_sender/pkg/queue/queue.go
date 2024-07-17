@@ -5,6 +5,12 @@ import (
 	"github.com/streadway/amqp"
 )
 
+type Queue interface {
+	PublishMessage(body string) error
+	ConsumeMessages() (<-chan amqp.Delivery, error)
+	Close()
+}
+
 type RabbitMQ struct {
 	connection *amqp.Connection
 	channel    *amqp.Channel

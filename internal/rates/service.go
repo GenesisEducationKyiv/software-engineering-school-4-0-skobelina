@@ -2,7 +2,7 @@ package rates
 
 import (
 	"github.com/skobelina/currency_converter/infrastructure/currencies"
-	errors "github.com/skobelina/currency_converter/pkg/utils/errors"
+	"github.com/skobelina/currency_converter/pkg/utils/serializer"
 	"gorm.io/gorm"
 )
 
@@ -21,7 +21,7 @@ func NewService(repo *gorm.DB) *RateService {
 func (s *RateService) Get() (*float64, error) {
 	rate, err := s.handler.Handle()
 	if err != nil {
-		return nil, errors.NewInternalServerErrorf("all providers failed: %v", err)
+		return nil, serializer.NewInternalServerErrorf("all providers failed: %v", err)
 	}
 	return &rate, nil
 }

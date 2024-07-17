@@ -4,7 +4,7 @@ import (
 	"strings"
 
 	domains "github.com/skobelina/currency_converter/internal"
-	errors "github.com/skobelina/currency_converter/pkg/utils/errors"
+	"github.com/skobelina/currency_converter/pkg/utils/serializer"
 )
 
 type Subscriber struct {
@@ -49,13 +49,13 @@ type SearchSubscribeResponse struct {
 
 func (s *Subscriber) Validate() error {
 	if strings.TrimSpace(s.Email) == "" {
-		return errors.NewBadRequestError("validation errors occurent: email must be set")
+		return serializer.NewBadRequestError("validation errors occurent: email must be set")
 	}
 	if strings.ContainsAny(s.Email, " \t\n") {
-		return errors.NewBadRequestError("validation errors occurent: email cannot contain spaces")
+		return serializer.NewBadRequestError("validation errors occurent: email cannot contain spaces")
 	}
 	if !isEmailValid(s.Email) {
-		return errors.NewBadRequestError("validation errors occurent: email format is invalid")
+		return serializer.NewBadRequestError("validation errors occurent: email format is invalid")
 	}
 	return nil
 }
@@ -64,4 +64,18 @@ func isEmailValid(email string) bool {
 	at := strings.Index(email, "@")
 	dot := strings.LastIndex(email, ".")
 	return at > 0 && dot > at
+}
+
+type Event struct {
+	EventID     string    `json:"eventId"`
+	EventType   string    `json:"eventType"`
+	AggregateID string    `json:"aggregateId"`
+	Timestamp   string    `json:"timestamp"`
+	Data        EventData `json:"data"`
+}
+
+type EventData struct {
+	CreatedAt    string `json:"createdAt"`
+	ExchangeRate string `json:"exchangeRate"`
+	Email        string `json:"email"`
 }

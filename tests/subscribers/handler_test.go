@@ -9,7 +9,7 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/skobelina/currency_converter/internal/subscribers"
-	utils "github.com/skobelina/currency_converter/pkg/utils/errors"
+	"github.com/skobelina/currency_converter/pkg/utils/serializer"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )
@@ -32,6 +32,14 @@ func (m *MockService) Search(filter *subscribers.SearchSubscribeRequest) (*subsc
 		return nil, args.Error(1)
 	}
 	return args.Get(0).(*subscribers.SearchSubscribeResponse), args.Error(1)
+}
+
+func (m *MockService) Delete(request *subscribers.SubscriberRequest) (*string, error) {
+	args := m.Called(request)
+	if args.Get(0) == nil {
+		return nil, args.Error(1)
+	}
+	return args.Get(0).(*string), args.Error(1)
 }
 
 func TestHandler_Create_Success(t *testing.T) {
@@ -62,7 +70,7 @@ func TestHandler_Create_Success(t *testing.T) {
 
 func TestHandler_Create_Conflict(t *testing.T) {
 	mockService := new(MockService)
-	mockService.On("Create", mock.Anything).Return(nil, utils.NewIsConflictError("conflict error"))
+	mockService.On("Create", mock.Anything).Return(nil, serializer.NewIsConflictError("conflict error"))
 
 	handler := subscribers.NewHandler(mockService)
 	router := mux.NewRouter()
@@ -109,7 +117,7 @@ func TestHandler_Search_Success(t *testing.T) {
 
 func TestHandler_Search_BadRequest(t *testing.T) {
 	mockService := new(MockService)
-	mockService.On("Search", mock.Anything).Return(nil, utils.NewBadRequestError("bad request"))
+	mockService.On("Search", mock.Anything).Return(nil, serializer.NewBadRequestError("bad request"))
 
 	handler := subscribers.NewHandler(mockService)
 	router := mux.NewRouter()

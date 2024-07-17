@@ -8,7 +8,7 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/skobelina/currency_converter/internal/rates"
-	utils "github.com/skobelina/currency_converter/pkg/utils/errors"
+	"github.com/skobelina/currency_converter/pkg/utils/serializer"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )
@@ -50,7 +50,7 @@ func TestHandler_GetRate_Success(t *testing.T) {
 
 func TestHandler_GetRate_InternalServerError(t *testing.T) {
 	mockService := new(MockService)
-	mockService.On("Get").Return(nil, utils.NewInternalServerError("internal server error"))
+	mockService.On("Get").Return(nil, serializer.NewInternalServerError("internal server error"))
 
 	handler := rates.NewHandler(mockService)
 	router := mux.NewRouter()
@@ -71,7 +71,7 @@ func TestHandler_GetRate_InternalServerError(t *testing.T) {
 
 func TestHandler_GetRate_BadRequest(t *testing.T) {
 	mockService := new(MockService)
-	mockService.On("Get").Return(nil, utils.NewBadRequestError("bad request"))
+	mockService.On("Get").Return(nil, serializer.NewBadRequestError("bad request"))
 
 	handler := rates.NewHandler(mockService)
 	router := mux.NewRouter()

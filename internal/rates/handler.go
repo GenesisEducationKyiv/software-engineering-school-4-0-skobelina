@@ -6,7 +6,6 @@ import (
 	"github.com/gorilla/mux"
 	"gorm.io/gorm"
 
-	utils "github.com/skobelina/currency_converter/pkg/utils/errors"
 	"github.com/skobelina/currency_converter/pkg/utils/rest"
 	"github.com/skobelina/currency_converter/pkg/utils/serializer"
 )
@@ -38,11 +37,11 @@ func (h *handler) get(w http.ResponseWriter, r *http.Request) error {
 	response, err := h.service.Get()
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
-			return utils.NewItemNotFoundError("rate not found")
+			return serializer.NewItemNotFoundError("rate not found")
 		} else if err.Error() == "bad request" {
-			return utils.NewBadRequestError("bad request")
+			return serializer.NewBadRequestError("bad request")
 		} else if err.Error() == "internal server error" {
-			return utils.NewInternalServerError("internal server error")
+			return serializer.NewInternalServerError("internal server error")
 		} else {
 			return err
 		}

@@ -33,7 +33,7 @@ func New() Api {
 	r := mux.NewRouter()
 	rates.NewHandler(deps.Rates).Register(r)
 	subscribers.NewHandler(deps.Subscribers).Register(r)
-	cronJobService := cronJobs.NewService(deps.Repo, deps.Rates, deps.Subscribers, deps.RabbitMQ)
+	cronJobService := cronJobs.NewService(deps.Rates, deps.RabbitMQ)
 	cronJobs.NewHandler(cronJobService).Register(r)
 
 	r.Use(

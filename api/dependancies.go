@@ -27,11 +27,11 @@ func registerDependencies() *dependencies {
 	}
 	subscriberRepo := subscribers.NewRepository(repo)
 	rates := rates.NewService(repo)
-	subscribers := subscribers.NewService(subscriberRepo)
 	rabbitMQ, err := queue.NewRabbitMQ(rabbitMQURL, "events")
 	if err != nil {
 		logrus.Infof("failed to connect to RabbitMQ: %v", err)
 	}
+	subscribers := subscribers.NewService(subscriberRepo, rabbitMQ)
 	currencyRates, err := rates.Get()
 	if err != nil {
 		logrus.Infof("cannot preload currency rates: %v\n", err)

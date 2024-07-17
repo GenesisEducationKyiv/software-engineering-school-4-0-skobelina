@@ -4,7 +4,6 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
-	errors "github.com/skobelina/currency_converter/pkg/utils/errors"
 	"github.com/skobelina/currency_converter/pkg/utils/rest"
 	"github.com/skobelina/currency_converter/pkg/utils/serializer"
 )
@@ -12,7 +11,6 @@ import (
 const cronKey = "E6B3C4F7"
 
 type CronJobServiceInterface interface {
-	Close() error
 	NotificationExchangeRates() error
 }
 
@@ -30,7 +28,7 @@ func (h *handler) Register(r *mux.Router) {
 
 func (h *handler) notificationExchangeRates(w http.ResponseWriter, r *http.Request) error {
 	if valid := validateCronjobRequest(r); !valid {
-		return errors.NewForbiddenError()
+		return serializer.NewForbiddenError()
 	}
 	err := h.service.NotificationExchangeRates()
 	if err != nil {
