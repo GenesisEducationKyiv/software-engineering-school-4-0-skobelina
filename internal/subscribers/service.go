@@ -16,12 +16,14 @@ import (
 type SubscriberService struct {
 	repo     Repository
 	rabbitMQ *queue.RabbitMQ
+	saga     *Saga
 }
 
-func NewService(repo Repository, rabbitMQ *queue.RabbitMQ) *SubscriberService {
+func NewService(repo Repository, rabbitMQ *queue.RabbitMQ, saga *Saga) *SubscriberService {
 	return &SubscriberService{
 		repo:     repo,
 		rabbitMQ: rabbitMQ,
+		saga:     saga,
 	}
 }
 
@@ -35,8 +37,8 @@ func (s *SubscriberService) Create(request *SubscriberRequest) (*string, error) 
 	} else if exists {
 		return nil, serializer.NewIsConflictError("email already exists")
 	}
-	if err := s.repo.Create(subscriber); err != nil {
-		return nil, serializer.NewInternalServerErrorf("cannot create email db row: %v", err)
+	if err := s.saga.StartSubscribeSaga(request.Email); err != nil {
+		return nil, serializer.NewInternalServerErrorf("cannot start saga: %v", err)
 	}
 	status := constants.StatusAdded
 	if err := s.createSubscribeEvent(request.Email); err != nil {
