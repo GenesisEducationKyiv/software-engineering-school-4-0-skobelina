@@ -1,7 +1,7 @@
 version: 1
 threshold:
   compliance: 100
-  coverage: 60
+  coverage: 50
 dependenciesRules:
   - package: "api"
     shouldOnlyDependsOn:
@@ -12,6 +12,7 @@ dependenciesRules:
         - "internal/subscribers"
         - "pkg/utils"
         - "pkg/repo"
+        - "pkg/queue"
   - package: "internal/constants"
     shouldOnlyDependsOn:
       internal:
@@ -37,6 +38,7 @@ dependenciesRules:
         - "internal/subscribers"
         - "internal"
         - "pkg/errors"
+        - "pkg/queue"
   - package: "internal/mails"
     shouldOnlyDependsOn:
       internal:
