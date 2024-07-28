@@ -6,8 +6,8 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
 
-	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/sirupsen/logrus"
 	"github.com/skobelina/email_sender/configs"
 	cronjobs "github.com/skobelina/email_sender/internal/cron-jobs"
@@ -55,8 +55,14 @@ func main() {
 
 	go func() {
 		log.Println("Starting metrics server on :8081")
-		http.Handle("/metrics", promhttp.Handler())
-		if err := http.ListenAndServe(":8081", nil); err != nil {
+		srv := &http.Server{
+			Addr:         ":8081",
+			Handler:      http.DefaultServeMux,
+			ReadTimeout:  5 * time.Second,
+			WriteTimeout: 10 * time.Second,
+			IdleTimeout:  15 * time.Second,
+		}
+		if err := srv.ListenAndServe(); err != nil {
 			logrus.Fatalf("Error starting metrics server: %v", err)
 		}
 	}()
