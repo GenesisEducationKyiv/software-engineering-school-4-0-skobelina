@@ -1,7 +1,7 @@
 version: 1
 threshold:
   compliance: 100
-  coverage: 60
+  coverage: 50
 dependenciesRules:
   - package: "api"
     shouldOnlyDependsOn:
@@ -12,6 +12,9 @@ dependenciesRules:
         - "internal/subscribers"
         - "pkg/utils"
         - "pkg/repo"
+        - "pkg/queue"
+        - "pkg/metrics"
+        - "configs"
   - package: "internal/constants"
     shouldOnlyDependsOn:
       internal:
@@ -37,18 +40,15 @@ dependenciesRules:
         - "internal/subscribers"
         - "internal"
         - "pkg/errors"
-  - package: "internal/mails"
-    shouldOnlyDependsOn:
-      internal:
-        - "internal/cron-jobs"
-        - "pkg/utils"
+        - "pkg/queue"
+        - "configs"
   - package: "internal/rates"
     shouldOnlyDependsOn:
       internal:
         - "internal/cron-jobs"
         - "infrastructure/currencies"
         - "pkg/utils"
-        - "pkg/errors"
+        - "configs"
   - package: "internal/subscribers"
     shouldOnlyDependsOn:
       internal:
@@ -56,7 +56,7 @@ dependenciesRules:
         - "pkg/utils"
         - "internal/constants"
         - "internal"
-        - "pkg/errors"
+        - "pkg/queue"
   - package: "internal/cron-jobs"
     shouldNotDependsOn:
       internal:

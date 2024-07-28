@@ -8,7 +8,7 @@ import (
 	reflect "reflect"
 
 	gomock "github.com/golang/mock/gomock"
-	mails "github.com/skobelina/currency_converter/internal/mails"
+	mails "github.com/skobelina/email_sender/internal/mails"
 )
 
 // MockMailServiceInterface is a mock of MailServiceInterface interface.
