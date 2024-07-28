@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
+	"github.com/sirupsen/logrus"
 	"github.com/skobelina/currency_converter/pkg/utils/rest"
 	"github.com/skobelina/currency_converter/pkg/utils/serializer"
 )
@@ -28,12 +29,15 @@ func (h *handler) Register(r *mux.Router) {
 
 func (h *handler) notificationExchangeRates(w http.ResponseWriter, r *http.Request) error {
 	if valid := validateCronjobRequest(r); !valid {
+		logrus.Warnf("Handler - Invalid cron job request")
 		return serializer.NewForbiddenError()
 	}
 	err := h.service.NotificationExchangeRates()
 	if err != nil {
+		logrus.Errorf("Handler - Error in NotificationExchangeRates: %v", err)
 		return err
 	}
+	logrus.Infof("Handler - NotificationExchangeRates successful")
 	return serializer.SendNoContent(w)
 }
 

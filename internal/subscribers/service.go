@@ -30,20 +30,26 @@ func NewService(repo Repository, rabbitMQ *queue.RabbitMQ, saga *Saga) *Subscrib
 func (s *SubscriberService) Create(request *SubscriberRequest) (*string, error) {
 	subscriber := request.Map()
 	if err := subscriber.Validate(); err != nil {
+		logrus.Warnf("SubscriberService - Validation error: %v", err)
 		return nil, err
 	}
 	if exists, err := s.checkEmail(subscriber.Email); err != nil {
+		logrus.Errorf("SubscriberService - Error checking email: %v", err)
 		return nil, err
 	} else if exists {
+		logrus.Warnf("SubscriberService - Email already exists: %s", subscriber.Email)
 		return nil, serializer.NewIsConflictError("email already exists")
 	}
 	if err := s.saga.StartSubscribeSaga(request.Email); err != nil {
+		logrus.Errorf("SubscriberService - Error starting saga: %v", err)
 		return nil, serializer.NewInternalServerErrorf("cannot start saga: %v", err)
 	}
 	status := constants.StatusAdded
 	if err := s.createSubscribeEvent(request.Email); err != nil {
+		logrus.Errorf("SubscriberService - Error creating subscribe event: %v", err)
 		return nil, err
 	}
+	logrus.Infof("SubscriberService - Subscriber created successfully: %s", subscriber.Email)
 	return &status, nil
 }
 
@@ -91,9 +97,11 @@ func (s *SubscriberService) Search(filter *SearchSubscribeRequest) (*SearchSubsc
 
 	subscribers, count, err := s.repo.Search(filter)
 	if err != nil {
+		logrus.Errorf("SubscriberService - Error searching subscribers: %v", err)
 		return nil, serializer.NewInternalServerErrorf("cannot get subscribers: %v", err)
 	}
 
+	logrus.Infof("SubscriberService - Found %d subscribers", count)
 	return &SearchSubscribeResponse{
 		Data: subscribers,
 		Pagination: &domains.Pagination{
@@ -109,19 +117,24 @@ func (s *SubscriberService) Delete(request *SubscriberRequest) (*string, error) 
 	subscriber, err := s.repo.FindByEmail(request.Email)
 	if err != nil {
 		if serializer.Is(err, gorm.ErrRecordNotFound) {
+			logrus.Warnf("SubscriberService - Subscriber not found: %s", request.Email)
 			return nil, serializer.NewItemNotFoundErrorf("subscriber not found")
 		}
+		logrus.Errorf("SubscriberService - Error finding subscriber: %v", err)
 		return nil, serializer.NewInternalServerErrorf("failed to find subscriber: %v", err)
 	}
 
 	if err := s.repo.Delete(subscriber); err != nil {
+		logrus.Errorf("SubscriberService - Error deleting subscriber: %v", err)
 		return nil, serializer.NewInternalServerErrorf("failed to delete subscriber: %v", err)
 	}
 
 	status := constants.StatusDeleted
 	if err := s.createUnsubscribeEvent(request.Email); err != nil {
+		logrus.Errorf("SubscriberService - Error creating unsubscribe event: %v", err)
 		return nil, err
 	}
+	logrus.Infof("SubscriberService - Subscriber deleted successfully: %s", request.Email)
 	return &status, nil
 }
 

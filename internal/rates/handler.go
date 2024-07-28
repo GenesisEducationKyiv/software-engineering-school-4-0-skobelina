@@ -6,6 +6,7 @@ import (
 	"github.com/gorilla/mux"
 	"gorm.io/gorm"
 
+	"github.com/sirupsen/logrus"
 	"github.com/skobelina/currency_converter/pkg/utils/rest"
 	"github.com/skobelina/currency_converter/pkg/utils/serializer"
 )
@@ -37,14 +38,19 @@ func (h *handler) get(w http.ResponseWriter, r *http.Request) error {
 	response, err := h.service.Get()
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
+			logrus.Warnf("Handler - Rate not found")
 			return serializer.NewItemNotFoundError("rate not found")
 		} else if err.Error() == "bad request" {
+			logrus.Warnf("Handler - Bad request error")
 			return serializer.NewBadRequestError("bad request")
 		} else if err.Error() == "internal server error" {
+			logrus.Errorf("Handler - Internal server error")
 			return serializer.NewInternalServerError("internal server error")
 		} else {
+			logrus.Errorf("Handler - Unexpected error: %v", err)
 			return err
 		}
 	}
+	logrus.Infof("Handler - Successfully fetched rate")
 	return serializer.SendJSON(w, http.StatusOK, response)
 }

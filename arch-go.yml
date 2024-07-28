@@ -13,6 +13,7 @@ dependenciesRules:
         - "pkg/utils"
         - "pkg/repo"
         - "pkg/queue"
+        - "pkg/metrics"
         - "configs"
   - package: "internal/constants"
     shouldOnlyDependsOn:

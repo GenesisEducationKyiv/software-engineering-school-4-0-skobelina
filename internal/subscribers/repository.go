@@ -1,6 +1,7 @@
 package subscribers
 
 import (
+	"github.com/sirupsen/logrus"
 	"gorm.io/gorm"
 )
 
@@ -20,31 +21,41 @@ func NewRepository(db *gorm.DB) Repository {
 }
 
 func (r *repository) Create(subscriber *Subscriber) error {
+	logrus.Infof("Repository - Creating subscriber: %s", subscriber.Email)
 	return r.db.Create(subscriber).Error
 }
 
 func (r *repository) FindByEmail(email string) (*Subscriber, error) {
 	var subscriber Subscriber
-	if err := r.db.Where("email = ?", email).First(&subscriber).Error; err != nil {
+	err := r.db.Where("email = ?", email).First(&subscriber).Error
+	if err != nil {
+		logrus.Warnf("Repository - Subscriber not found: %s", email)
 		return nil, err
 	}
+	logrus.Infof("Repository - Subscriber found: %s", email)
 	return &subscriber, nil
 }
 
 func (r *repository) Search(filter *SearchSubscribeRequest) ([]Subscriber, int64, error) {
 	var subscribers []Subscriber
 	q := r.db.Offset(filter.Offset).Limit(filter.Limit).Order(filter.OrderString())
-	if err := q.Find(&subscribers).Error; err != nil {
+	err := q.Find(&subscribers).Error
+	if err != nil {
+		logrus.Errorf("Repository - Error searching subscribers: %v", err)
 		return nil, 0, err
 	}
 
 	var count int64
-	if err := r.db.Model(&Subscriber{}).Count(&count).Error; err != nil {
+	err = r.db.Model(&Subscriber{}).Count(&count).Error
+	if err != nil {
+		logrus.Errorf("Repository - Error counting subscribers: %v", err)
 		return nil, 0, err
 	}
+	logrus.Infof("Repository - Found %d subscribers", count)
 	return subscribers, count, nil
 }
 
 func (r *repository) Delete(subscriber *Subscriber) error {
+	logrus.Infof("Repository - Deleting subscriber: %s", subscriber.Email)
 	return r.db.Delete(subscriber).Error
 }
