@@ -1,0 +1,44 @@
+run:
+  timeout: 5m
+
+linters:
+  enable:
+    # Code correctness and bug prevention
+    - govet
+    - typecheck
+    - ineffassign
+    - unused
+
+    # Code style and formatting
+    - gofumpt
+    - misspell
+    - revive
+
+    # Performance optimizations
+    - prealloc
+
+    # Code complexity management
+    - gocyclo
+    - unparam
+
+    # Security checks
+    - gosec
+
+    # Specific checks
+    - gosimple
+
+linters-settings:
+  funlen:
+    ignore-comments: true
+    lines: 50
+  gofumpt:
+    extra-rules: true
+  gocyclo:
+    min-complexity: 10
+  revive:
+    ignore-generated-header: true
+    severity: warning
+  misspell:
+    locale: US
+  lll:
+    line-length: 120
