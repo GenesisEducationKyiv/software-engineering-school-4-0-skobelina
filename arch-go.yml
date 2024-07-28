@@ -40,7 +40,11 @@ dependenciesRules:
         - "internal"
         - "pkg/errors"
         - "pkg/queue"
-        - "configs"
+  - package: "internal/mails"
+    shouldOnlyDependsOn:
+      internal:
+        - "internal/cron-jobs"
+        - "pkg/utils"
   - package: "internal/rates"
     shouldOnlyDependsOn:
       internal:
