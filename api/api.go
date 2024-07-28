@@ -15,11 +15,6 @@ import (
 	"github.com/skobelina/currency_converter/internal/subscribers"
 )
 
-var (
-	databaseURL = os.Getenv("DATABASE_URL")
-	rabbitMQURL = os.Getenv("RABBITMQ_URL")
-)
-
 type Api interface {
 	Handle() error
 }
@@ -33,7 +28,7 @@ func New() Api {
 	r := mux.NewRouter()
 	rates.NewHandler(deps.Rates).Register(r)
 	subscribers.NewHandler(deps.Subscribers).Register(r)
-	cronJobService := cronJobs.NewService(deps.Repo, deps.Rates, deps.Subscribers, deps.RabbitMQ)
+	cronJobService := cronJobs.NewService(deps.Rates, deps.RabbitMQ)
 	cronJobs.NewHandler(cronJobService).Register(r)
 
 	r.Use(

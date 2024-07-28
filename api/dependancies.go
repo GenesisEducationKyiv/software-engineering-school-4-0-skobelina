@@ -1,7 +1,10 @@
 package api
 
 import (
+	"log"
+
 	"github.com/sirupsen/logrus"
+	"github.com/skobelina/currency_converter/configs"
 	"github.com/skobelina/currency_converter/internal/rates"
 	"github.com/skobelina/currency_converter/internal/subscribers"
 	"github.com/skobelina/currency_converter/pkg/queue"
@@ -18,7 +21,11 @@ type dependencies struct {
 }
 
 func registerDependencies() *dependencies {
-	repo, err := repo.Connect(databaseURL)
+	config, err := configs.LoadConfig(".env")
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+	repo, err := repo.Connect(config.DatabaseURL)
 	if err != nil {
 		panic(err)
 	}
@@ -26,12 +33,12 @@ func registerDependencies() *dependencies {
 		logrus.Infof("failed to migrate database: %v", err)
 	}
 	subscriberRepo := subscribers.NewRepository(repo)
-	rates := rates.NewService(repo)
-	subscribers := subscribers.NewService(subscriberRepo)
-	rabbitMQ, err := queue.NewRabbitMQ(rabbitMQURL, "events")
+	rates := rates.NewService(repo, config)
+	rabbitMQ, err := queue.NewRabbitMQ(config.RabbitMQURL, "events")
 	if err != nil {
 		logrus.Infof("failed to connect to RabbitMQ: %v", err)
 	}
+	subscribers := subscribers.NewService(subscriberRepo, rabbitMQ)
 	currencyRates, err := rates.Get()
 	if err != nil {
 		logrus.Infof("cannot preload currency rates: %v\n", err)

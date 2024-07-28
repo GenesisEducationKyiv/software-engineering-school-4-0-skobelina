@@ -13,6 +13,7 @@ dependenciesRules:
         - "pkg/utils"
         - "pkg/repo"
         - "pkg/queue"
+        - "configs"
   - package: "internal/constants"
     shouldOnlyDependsOn:
       internal:
@@ -50,7 +51,7 @@ dependenciesRules:
         - "internal/cron-jobs"
         - "infrastructure/currencies"
         - "pkg/utils"
-        - "pkg/errors"
+        - "configs"
   - package: "internal/subscribers"
     shouldOnlyDependsOn:
       internal:
@@ -58,7 +59,7 @@ dependenciesRules:
         - "pkg/utils"
         - "internal/constants"
         - "internal"
-        - "pkg/errors"
+        - "pkg/queue"
   - package: "internal/cron-jobs"
     shouldNotDependsOn:
       internal:

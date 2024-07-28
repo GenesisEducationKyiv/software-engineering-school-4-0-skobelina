@@ -1,80 +1,41 @@
 package main
 
 import (
-	"encoding/json"
-	"os"
+	"log"
 
 	"github.com/sirupsen/logrus"
+	"github.com/skobelina/email_sender/configs"
+	cronjobs "github.com/skobelina/email_sender/internal/cron-jobs"
 	"github.com/skobelina/email_sender/internal/mails"
-	"github.com/skobelina/email_sender/internal/mails/templates"
 	"github.com/skobelina/email_sender/pkg/queue"
+	"github.com/skobelina/email_sender/pkg/repo"
 )
-
-var (
-	rabbitMQURL = os.Getenv("RABBITMQ_URL")
-)
-
-type Event struct {
-	EventID     string    `json:"eventId"`
-	EventType   string    `json:"eventType"`
-	AggregateID string    `json:"aggregateId"`
-	Timestamp   string    `json:"timestamp"`
-	Data        EventData `json:"data"`
-}
-
-type EventData struct {
-	CreatedAt    string   `json:"createdAt"`
-	ExchangeRate string   `json:"exchangeRate"`
-	Recipients   []string `json:"recipients"`
-}
 
 func main() {
-	mailPassword := os.Getenv("MAILPASS")
-	if mailPassword == "" {
-		logrus.Fatal("MAILPASS environment variable is required")
-	}
-	emailSender := mails.NewService("marisa.skobelina@gmail.com", "smtp.gmail.com")
-
-	rabbitMQ, err := queue.NewRabbitMQ(rabbitMQURL, "events")
+	config, err := configs.LoadConfig(".env")
 	if err != nil {
-		logrus.Fatalf("Failed to connect to RabbitMQ: %v", err)
+		log.Fatal(err.Error())
+	}
+
+	repo, err := repo.Connect(config.DatabaseURL)
+	if err != nil {
+		panic(err)
+	}
+	if err := repo.AutoMigrate(&cronjobs.Subscriber{}); err != nil {
+		logrus.Infof("failed to migrate database: %v", err)
+	}
+	rabbitMQ, err := queue.NewRabbitMQ(config.RabbitMQURL, "events")
+	if err != nil {
+		logrus.Infof("failed to connect to RabbitMQ: %v", err)
 	}
 	defer rabbitMQ.Close()
 
-	msgs, err := rabbitMQ.ConsumeMessages()
-	if err != nil {
-		logrus.Fatalf("Failed to register a consumer: %v", err)
-	}
-	forever := make(chan bool)
+	subscriberRepo := cronjobs.NewRepository(repo)
+	mailService := mails.NewService(mails.DefaultMailSendAddress, mails.DefaultMailHost, config)
+	cronJobService := cronjobs.NewCronJobService(mailService, rabbitMQ, subscriberRepo)
+	cronJobService.InitializeSubscribers()
+	logrus.Info("Starting email sender service")
 
-	go func() {
-		for d := range msgs {
-			logrus.Infof("Received a message: %s", d.Body)
-
-			var event Event
-			if err := json.Unmarshal(d.Body, &event); err != nil {
-				logrus.Infof("Error unmarshalling message: %v", err)
-				continue
-			}
-			if event.EventType == "CurrencyRate" {
-				logrus.Infof("Processing event: %+v", event)
-
-				temp := templates.ExchangeRateTemplate{
-					CreatedAt:    event.Data.CreatedAt,
-					ExchangeRate: event.Data.ExchangeRate,
-				}
-				err := emailSender.SendEmail(event.Data.Recipients, "Currency Rate", temp)
-				if err != nil {
-					logrus.Errorf("Error sending email: %v", err)
-				} else {
-					logrus.Infof("Successfully sent email to %v", event.Data.Recipients)
-				}
-			} else {
-				logrus.Infof("Ignoring event of type: %s", event.EventType)
-			}
-		}
-	}()
-
-	logrus.Infof("Waiting for messages")
-	<-forever
+	go cronJobService.ConsumeMessages()
+	select {}
 }

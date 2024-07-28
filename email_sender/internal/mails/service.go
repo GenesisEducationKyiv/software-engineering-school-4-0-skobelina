@@ -1,10 +1,10 @@
 package mails
 
 import (
-	"os"
 	"time"
 
 	"github.com/sirupsen/logrus"
+	"github.com/skobelina/email_sender/configs"
 	gomail "gopkg.in/gomail.v2"
 )
 
@@ -28,16 +28,18 @@ type MailService struct {
 	username string
 	host     string
 	messages chan []*gomail.Message
+	config   *configs.Config
 }
 
 var _ MailServiceInterface = (*MailService)(nil)
 
-func NewService(username string, host string) *MailService {
+func NewService(username string, host string, config *configs.Config) *MailService {
 	s := &MailService{
 		username: username,
 		host:     host,
 
 		messages: make(chan []*gomail.Message, messagesBuffer),
+		config:   config,
 	}
 
 	go s.scheduler()
@@ -90,7 +92,7 @@ func (s *MailService) scheduler() {
 	var sendCloser gomail.SendCloser
 	var err error
 
-	d := gomail.NewDialer(DefaultMailHost, DefaultMailPort, DefaultMailSendAddress, os.Getenv("MAILPASS"))
+	d := gomail.NewDialer(DefaultMailHost, DefaultMailPort, DefaultMailSendAddress, s.config.MailPass)
 	open := false
 
 	for {

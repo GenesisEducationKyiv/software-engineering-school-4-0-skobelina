@@ -7,8 +7,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/sirupsen/logrus"
-	domains "github.com/skobelina/currency_converter/internal"
-	"github.com/skobelina/currency_converter/internal/subscribers"
+	"github.com/skobelina/currency_converter/internal/constants"
 )
 
 type Event struct {
@@ -20,38 +19,16 @@ type Event struct {
 }
 
 type EventData struct {
-	CreatedAt    string   `json:"createdAt"`
-	ExchangeRate string   `json:"exchangeRate"`
-	Recipients   []string `json:"recipients"`
-}
-
-type ExchangeRateTemplate struct {
-	CreatedAt    string
-	ExchangeRate string
+	CreatedAt    string `json:"createdAt"`
+	ExchangeRate string `json:"exchangeRate"`
 }
 
 func (s *CronJobService) NotificationExchangeRates() error {
-	subscribersResp, err := s.subscribers.Search(&subscribers.SearchSubscribeRequest{
-		Filter: domains.DefaultFilter(),
-	})
-	if err != nil {
-		return err
-	}
-	recipients := make([]string, 0, len(subscribersResp.Data))
-	for _, person := range subscribersResp.Data {
-		recipients = append(recipients, person.Email)
-	}
-	currentTime := time.Now().Format("2006-01-02")
-
+	currentTime := time.Now().Format(constants.DateFormatYMD)
 	exchangeRate, err := s.rates.Get()
 	if err != nil {
 		return err
 	}
-	template := ExchangeRateTemplate{
-		CreatedAt:    currentTime,
-		ExchangeRate: strconv.FormatFloat(*exchangeRate, 'f', 2, 64),
-	}
-
 	event := Event{
 		EventID:     uuid.New().String(),
 		EventType:   "CurrencyRate",
@@ -59,8 +36,7 @@ func (s *CronJobService) NotificationExchangeRates() error {
 		Timestamp:   time.Now().Format(time.RFC3339),
 		Data: EventData{
 			CreatedAt:    currentTime,
-			ExchangeRate: template.ExchangeRate,
-			Recipients:   recipients,
+			ExchangeRate: strconv.FormatFloat(*exchangeRate, 'f', 2, 64),
 		},
 	}
 	body, err := json.Marshal(event)
@@ -73,6 +49,6 @@ func (s *CronJobService) NotificationExchangeRates() error {
 		return err
 	}
 
-	logrus.Infof("CronJob: NotificationExchangeRates: sent to %d subscribers", len(recipients))
+	logrus.Infof("CronJob: NotificationExchangeRates: sent exchange rate event")
 	return nil
 }
