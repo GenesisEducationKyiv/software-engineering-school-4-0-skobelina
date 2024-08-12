@@ -3,7 +3,8 @@ package constants
 // STATUSES
 
 const (
-	StatusAdded = "e-mail added"
+	StatusAdded   = "e-mail added"
+	StatusDeleted = "e-mail deleted"
 )
 
 const (
@@ -12,6 +13,8 @@ const (
 
 	OrderASC  = "asc"
 	OrderDESC = "desc"
+
+	DateFormatYMD = "2006-01-02"
 )
 const (
 	CurrencyUSD = "USD"

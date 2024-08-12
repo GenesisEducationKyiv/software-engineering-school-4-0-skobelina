@@ -6,7 +6,6 @@ import (
 	"github.com/gorilla/mux"
 
 	domains "github.com/skobelina/currency_converter/internal"
-	errors "github.com/skobelina/currency_converter/pkg/errors"
 	"github.com/skobelina/currency_converter/pkg/utils/rest"
 	"github.com/skobelina/currency_converter/pkg/utils/serializer"
 )
@@ -14,6 +13,7 @@ import (
 type SubscriberServiceInterface interface {
 	Create(request *SubscriberRequest) (*string, error)
 	Search(filter *SearchSubscribeRequest) (*SearchSubscribeResponse, error)
+	Delete(request *SubscriberRequest) (*string, error)
 }
 
 type handler struct {
@@ -27,6 +27,7 @@ func NewHandler(s SubscriberServiceInterface) *handler {
 func (h *handler) Register(r *mux.Router) {
 	r.HandleFunc("/api/subscribe", rest.ErrorHandler(h.create)).Methods("POST", "OPTIONS")
 	r.HandleFunc("/api/subscribe", rest.ErrorHandler(h.search)).Methods("GET", "OPTIONS")
+	r.HandleFunc("/api/subscribe", rest.ErrorHandler(h.delete)).Methods("DELETE", "OPTIONS")
 }
 
 // swagger:route POST /subscribe Subscription createSubscribe
@@ -66,10 +67,29 @@ func (h *handler) search(w http.ResponseWriter, r *http.Request) error {
 	return serializer.SendJSON(w, http.StatusOK, response)
 }
 
+// swagger:route DELETE /subscribe Subscription deleteSubscribe
+// Unsubscribe from receiving current exchange rates
+//
+// responses:
+//
+//	200: body:message ok
+//	404: notFound
+func (h *handler) delete(w http.ResponseWriter, r *http.Request) error {
+	request := new(SubscriberRequest)
+	if err := serializer.ParseJsonBody(r.Body, request); err != nil {
+		return err
+	}
+	status, err := h.service.Delete(request)
+	if err != nil {
+		return err
+	}
+	return serializer.SendJSON(w, http.StatusOK, status)
+}
+
 func getFilterFromQuery(r *http.Request) (*SearchSubscribeRequest, error) {
 	filter, err := domains.GetFilterFromQuery(r)
 	if err != nil {
-		return nil, errors.NewBadRequestError(err)
+		return nil, serializer.NewBadRequestError(err)
 	}
 	return &SearchSubscribeRequest{
 		Filter: *filter,

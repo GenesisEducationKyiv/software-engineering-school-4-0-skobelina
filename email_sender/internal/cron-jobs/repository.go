@@ -1,4 +1,4 @@
-package subscribers
+package cronjobs
 
 import (
 	"gorm.io/gorm"
@@ -7,8 +7,9 @@ import (
 type Repository interface {
 	Create(subscriber *Subscriber) error
 	FindByEmail(email string) (*Subscriber, error)
-	Search(filter *SearchSubscribeRequest) ([]Subscriber, int64, error)
+	Search() ([]Subscriber, error)
 	Delete(subscriber *Subscriber) error
+	DeleteAll() error
 }
 
 type repository struct {
@@ -31,20 +32,19 @@ func (r *repository) FindByEmail(email string) (*Subscriber, error) {
 	return &subscriber, nil
 }
 
-func (r *repository) Search(filter *SearchSubscribeRequest) ([]Subscriber, int64, error) {
+func (r *repository) Search() ([]Subscriber, error) {
 	var subscribers []Subscriber
-	q := r.db.Offset(filter.Offset).Limit(filter.Limit).Order(filter.OrderString())
-	if err := q.Find(&subscribers).Error; err != nil {
-		return nil, 0, err
+	err := r.db.Find(&subscribers).Error
+	if err != nil {
+		return nil, err
 	}
-
-	var count int64
-	if err := r.db.Model(&Subscriber{}).Count(&count).Error; err != nil {
-		return nil, 0, err
-	}
-	return subscribers, count, nil
+	return subscribers, nil
 }
 
 func (r *repository) Delete(subscriber *Subscriber) error {
 	return r.db.Delete(subscriber).Error
+}
+
+func (r *repository) DeleteAll() error {
+	return r.db.Session(&gorm.Session{AllowGlobalUpdate: true}).Delete(&Subscriber{}).Error
 }

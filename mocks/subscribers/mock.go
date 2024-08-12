@@ -49,6 +49,21 @@ func (mr *MockSubscriberServiceInterfaceMockRecorder) Create(request interface{}
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Create", reflect.TypeOf((*MockSubscriberServiceInterface)(nil).Create), request)
 }
 
+// Delete mocks base method.
+func (m *MockSubscriberServiceInterface) Delete(request *subscribers.SubscriberRequest) (*string, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Delete", request)
+	ret0, _ := ret[0].(*string)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// Delete indicates an expected call of Delete.
+func (mr *MockSubscriberServiceInterfaceMockRecorder) Delete(request interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Delete", reflect.TypeOf((*MockSubscriberServiceInterface)(nil).Delete), request)
+}
+
 // Search mocks base method.
 func (m *MockSubscriberServiceInterface) Search(filter *subscribers.SearchSubscribeRequest) (*subscribers.SearchSubscribeResponse, error) {
 	m.ctrl.T.Helper()
