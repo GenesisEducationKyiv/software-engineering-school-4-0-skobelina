@@ -1,0 +1,164 @@
+basePath: /api
+consumes:
+    - application/json
+definitions:
+    Pagination:
+        properties:
+            limit:
+                description: Limit is a count of values
+                format: int64
+                type: integer
+                x-go-name: Limit
+            offset:
+                description: Offset is a number of values that was skipped
+                format: int64
+                type: integer
+                x-go-name: Offset
+            order:
+                description: Order can be asc or dsc. asc by default
+                type: string
+                x-go-name: Order
+            totalItems:
+                description: TotalItems is a number of items
+                format: int64
+                type: integer
+                x-go-name: TotalItems
+        type: object
+        x-go-package: github.com/skobelina/currency_converter/internal
+    Subscriber:
+        properties:
+            email:
+                type: string
+                x-go-name: Email
+            id:
+                format: int64
+                type: integer
+                x-go-name: ID
+        type: object
+        x-go-package: github.com/skobelina/currency_converter/internal/subscribers
+    SubscriberRequest:
+        properties:
+            email:
+                type: string
+                x-go-name: Email
+        type: object
+        x-go-package: github.com/skobelina/currency_converter/internal/subscribers
+    message:
+        properties:
+            message:
+                type: string
+                x-go-name: Message
+        type: object
+        x-go-name: JsonMessage
+        x-go-package: github.com/skobelina/currency_converter/pkg/utils/serializer
+    rateResponse:
+        properties:
+            rate:
+                format: double
+                type: number
+                x-go-name: Rate
+        type: object
+        x-go-name: Rate
+        x-go-package: github.com/skobelina/currency_converter/internal/rates
+    searchSubscribeResponse:
+        properties:
+            data:
+                items:
+                    $ref: '#/definitions/Subscriber'
+                type: array
+                x-go-name: Data
+            pagination:
+                $ref: '#/definitions/Pagination'
+        type: object
+        x-go-name: SearchSubscribeResponse
+        x-go-package: github.com/skobelina/currency_converter/internal/subscribers
+host: localhost:8080
+info:
+    description: ExchangeRates
+    version: 1.0.0
+paths:
+    /rate:
+        get:
+            description: Get the current USD to UAH rate
+            operationId: getRate
+            responses:
+                "200":
+                    description: ok
+                    schema:
+                        $ref: '#/definitions/rateResponse'
+                "400":
+                    $ref: '#/responses/statusBadRequest'
+            tags:
+                - Rate
+    /subscribe:
+        delete:
+            description: Unsubscribe from receiving current exchange rates
+            operationId: deleteSubscribe
+            parameters:
+                - in: body
+                  name: Body
+                  required: true
+                  schema:
+                    $ref: '#/definitions/SubscriberRequest'
+            responses:
+                "200":
+                    description: ok
+                    schema:
+                        $ref: '#/definitions/message'
+                "404":
+                    $ref: '#/responses/notFound'
+            tags:
+                - Subscription
+        get:
+            description: Search all subscribers
+            operationId: searchSubscribe
+            parameters:
+                - description: Offset is a number of values that was skipped
+                  format: int64
+                  in: query
+                  name: offset
+                  type: integer
+                  x-go-name: Offset
+                - description: Limit is a count of values
+                  format: int64
+                  in: query
+                  name: limit
+                  type: integer
+                  x-go-name: Limit
+                - description: SortBy
+                  in: query
+                  items:
+                    type: string
+                  name: sortBy
+                  type: array
+                  x-go-name: SortBy
+            responses:
+                "200":
+                    description: ok
+                    schema:
+                        $ref: '#/definitions/searchSubscribeResponse'
+            tags:
+                - Subscription
+        post:
+            description: Sign up to receive the current exchange rates
+            operationId: createSubscribe
+            parameters:
+                - in: body
+                  name: Body
+                  required: true
+                  schema:
+                    $ref: '#/definitions/SubscriberRequest'
+            responses:
+                "200":
+                    description: ok
+                    schema:
+                        $ref: '#/definitions/message'
+                "409":
+                    $ref: '#/responses/statusConflict'
+            tags:
+                - Subscription
+produces:
+    - application/json
+schemes:
+    - http
+swagger: "2.0"

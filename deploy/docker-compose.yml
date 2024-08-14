@@ -1,0 +1,41 @@
+version: '3.8'
+
+services:
+  api:
+    image: my-golang-app:latest
+    ports:
+      - "8080:8080"
+    environment:
+      DATABASE_URL: "postgres://postgres:mypassword@db:5432/gses?sslmode=disable"
+      APP_CURRENCY_EXCHANGE_URL: "https://api.apilayer.com/exchangerates_data/latest"
+      APP_CURRENCY_EXCHANGE_KEY: "EPPBjcIYnYl0rToRCEWpzFm3S8JYWCRq"
+      MAILPASS: "ikreezqkkhflijn"
+      RABBITMQ_URL: "amqp://guest:guest@rabbitmq_custom:5672/"
+    depends_on:
+      - db
+      - rabbitmq_custom
+    build:
+      context: ..
+  db:
+    image: postgres:latest
+    environment:
+      POSTGRES_DB: gses
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: mypassword
+  rabbitmq_custom:
+    image: rabbitmq:3-management
+    container_name: rabbitmq_custom
+    ports:
+      - "5673:5672"
+      - "15673:15672"
+  email_sender:
+    build:
+      context: ../email_sender
+      dockerfile: ../email_sender/Dockerfile
+    environment:
+      MAILPASS: "ikreezqkkhflijn"
+      RABBITMQ_URL: "amqp://guest:guest@rabbitmq_custom:5672/"
+    depends_on:
+      - rabbitmq_custom
+    ports:
+      - "8081:8080"

@@ -1,0 +1,107 @@
+name: lint
+
+on:
+  push:
+    branches:
+      - '*'
+  pull_request_target:
+    types:
+      - opened
+      - edited
+      - synchronize
+
+jobs:
+  golangci-lint-main:
+    name: golangci-lint for main project
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: checkout code
+        uses: actions/checkout@v4
+
+      - name: set up go
+        uses: actions/setup-go@v4
+        with:
+          go-version: 1.22.4
+
+      - name: install golangci-lint
+        run: go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
+
+      - name: go work init and download
+        run: |
+          echo 'go 1.22.4' > go.work
+          echo 'use .' >> go.work
+          echo 'use ./email_sender' >> go.work
+          go mod tidy
+          go mod download
+
+      - name: run golangci-lint
+        run: golangci-lint run ./...
+
+  golangci-lint-email-sender:
+    name: golangci-lint for email_sender
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: checkout code
+        uses: actions/checkout@v4
+
+      - name: set up go
+        uses: actions/setup-go@v4
+        with:
+          go-version: 1.22.4
+
+      - name: install golangci-lint
+        run: go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
+
+      - name: go mod tidy and download for email_sender
+        run: |
+          cd email_sender
+          go mod tidy
+          go mod download
+
+      - name: run golangci-lint for email_sender
+        run: |
+          cd email_sender
+          golangci-lint run ./...
+
+  gosec-main:
+    name: gosec for main project
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: checkout code
+        uses: actions/checkout@v4
+
+      - name: set up go
+        uses: actions/setup-go@v4
+        with:
+          go-version: 1.22.4
+
+      - name: install gosec
+        run: go install github.com/securego/gosec/v2/cmd/gosec@latest
+
+      - name: go work init and download
+        run: |
+          echo 'go 1.22.4' > go.work
+          echo 'use .' >> go.work
+          echo 'use ./email_sender' >> go.work
+          go mod tidy
+          go mod download
+
+      - name: run gosec
+        run: "`go env GOPATH`/bin/gosec ./..."
+
+      - name: install arch-go
+        run: go install github.com/fdaines/arch-go@latest
+
+      - name: go work init and download
+        run: |
+          echo 'go 1.22.4' > go.work
+          echo 'use .' >> go.work
+          echo 'use ./email_sender' >> go.work
+          go mod tidy
+          go mod download
+
+      - name: run arch-go
+        run: arch-go

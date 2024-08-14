@@ -1,0 +1,81 @@
+version: 1
+threshold:
+  compliance: 100
+  coverage: 50
+dependenciesRules:
+  - package: "api"
+    shouldOnlyDependsOn:
+      internal:
+        - "internal/cron-jobs"
+        - "internal/rates"
+        - "internal/subscribers"
+        - "pkg/utils"
+        - "pkg/repo"
+        - "pkg/queue"
+        - "pkg/metrics"
+        - "configs"
+  - package: "internal/constants"
+    shouldOnlyDependsOn:
+      internal:
+        - "internal/cron-jobs"
+        - "internal/rates"
+        - "internal/subscribers"
+        - "pkg/utils"
+  - package: "docs"
+    shouldOnlyDependsOn:
+      internal:
+        - "internal/cron-jobs"
+        - "internal/rates"
+        - "internal/subscribers"
+  - package: "internal/cron-jobs"
+    shouldOnlyDependsOn:
+      internal:
+        - "internal/cron-jobs"
+        - "pkg/utils"
+        - "internal/rates"
+        - "internal/subscribers"
+        - "internal"
+        - "pkg/errors"
+        - "pkg/queue"
+        - "configs"
+  - package: "internal/rates"
+    shouldOnlyDependsOn:
+      internal:
+        - "internal/cron-jobs"
+        - "infrastructure/currencies"
+        - "pkg/utils"
+        - "configs"
+  - package: "internal/subscribers"
+    shouldOnlyDependsOn:
+      internal:
+        - "internal/cron-jobs"
+        - "pkg/utils"
+        - "internal/constants"
+        - "internal"
+        - "pkg/queue"
+  - package: "internal/cron-jobs"
+    shouldNotDependsOn:
+      internal:
+        - "api"
+  - package: "pkg/repo"
+    shouldOnlyDependsOn:
+      internal:
+        - "pkg/utils"
+  - package: "pkg/utils"
+    shouldNotDependsOn:
+      internal:
+        - "api"
+        - "internal/cron-jobs"
+  - package: "infrastructure/currencies"
+    shouldNotDependsOn:
+      internal:
+        - "api"
+        - "internal/cron-jobs"
+
+contentsRules:
+  - package: "README.md"
+    shouldContain: ["# ExchangeRates v1", "## How to run", "## PR Pipeline", "## API doc with swagger", "## Mock tests"]
+
+namingRules:
+  - package: "internal"
+    shouldFollowConvention: "camelCase"
