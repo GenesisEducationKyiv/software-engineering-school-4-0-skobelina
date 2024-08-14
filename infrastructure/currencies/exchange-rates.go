@@ -9,6 +9,7 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/skobelina/currency_converter/configs"
 	"github.com/skobelina/currency_converter/internal/constants"
+	"github.com/skobelina/currency_converter/pkg/metrics"
 )
 
 type ProviderExchangeRates struct {
@@ -27,6 +28,12 @@ type CurrencyData struct {
 }
 
 func (p *ProviderExchangeRates) Handle(config *configs.Config) (float64, error) {
+	start := time.Now()
+	defer func() {
+		duration := time.Since(start)
+		metrics.RequestDuration.WithLabelValues("GET", config.AppCurrencyBeaconURL).Observe(duration.Seconds())
+	}()
+
 	var myClient = &http.Client{Timeout: 10 * time.Second}
 	req, err := http.NewRequest(http.MethodGet, config.AppCurrencyBeaconURL, http.NoBody)
 	if err != nil {
@@ -37,6 +44,7 @@ func (p *ProviderExchangeRates) Handle(config *configs.Config) (float64, error) 
 	resp, err := myClient.Do(req)
 	if err != nil {
 		logrus.Errorf("ProviderExchangeRates - Failed to perform request: %v", err)
+		metrics.RequestCount.WithLabelValues("GET", "error").Inc()
 		return p.BaseHandler.Handle(config)
 	}
 	defer func() {
@@ -48,11 +56,13 @@ func (p *ProviderExchangeRates) Handle(config *configs.Config) (float64, error) 
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		logrus.Errorf("ProviderExchangeRates - Failed to read response body: %v", err)
+		metrics.RequestCount.WithLabelValues("GET", "error").Inc()
 		return p.BaseHandler.Handle(config)
 	}
 
 	if resp.StatusCode != http.StatusOK {
 		logrus.Errorf("ProviderExchangeRates - Unexpected status code: %d", resp.StatusCode)
+		metrics.RequestCount.WithLabelValues("GET", "error").Inc()
 		return p.BaseHandler.Handle(config)
 	}
 
@@ -60,6 +70,7 @@ func (p *ProviderExchangeRates) Handle(config *configs.Config) (float64, error) 
 	if err := json.Unmarshal(body, &data); err != nil {
 		logrus.Errorf("ProviderExchangeRates - Failed to unmarshal response: %v", err)
 		logrus.Errorf("ProviderExchangeRates - Response body: %s", string(body))
+		metrics.RequestCount.WithLabelValues("GET", "error").Inc()
 		return p.BaseHandler.Handle(config)
 	}
 
@@ -67,7 +78,11 @@ func (p *ProviderExchangeRates) Handle(config *configs.Config) (float64, error) 
 	uahRate, uahExists := data.Rates[constants.CurrencyUAH]
 	if !usdExists || !uahExists {
 		logrus.Errorf("ProviderExchangeRates - USD or UAH rate not found")
+		metrics.RequestCount.WithLabelValues("GET", "error").Inc()
 		return p.BaseHandler.Handle(config)
 	}
+
+	logrus.Infof("ProviderExchangeRates - Successfully fetched exchange rates: USD: %f, UAH: %f", usdRate, uahRate)
+	metrics.RequestCount.WithLabelValues("GET", "success").Inc()
 	return uahRate / usdRate, nil
 }

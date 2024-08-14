@@ -1,8 +1,6 @@
 package api
 
 import (
-	"log"
-
 	"github.com/sirupsen/logrus"
 	"github.com/skobelina/currency_converter/configs"
 	"github.com/skobelina/currency_converter/internal/rates"
@@ -21,33 +19,51 @@ type dependencies struct {
 }
 
 func registerDependencies() *dependencies {
+	logrus.Info("Loading configuration")
 	config, err := configs.LoadConfig(".env")
 	if err != nil {
-		log.Fatal(err.Error())
+		logrus.Fatal("Failed to load config: ", err)
 	}
+
+	logrus.Info("Connecting to the database")
 	repo, err := repo.Connect(config.DatabaseURL)
 	if err != nil {
-		panic(err)
+		logrus.Fatal("Failed to connect to database: ", err)
 	}
+
+	logrus.Info("Migrating database schema")
 	if err := repo.AutoMigrate(&subscribers.Subscriber{}); err != nil {
-		logrus.Infof("failed to migrate database: %v", err)
+		logrus.Fatalf("Failed to migrate database: %v", err)
 	}
+
+	logrus.Info("Initializing repositories and services")
 	subscriberRepo := subscribers.NewRepository(repo)
-	rates := rates.NewService(repo, config)
+	ratesService := rates.NewService(repo, config)
+
+	logrus.Info("Connecting to RabbitMQ")
 	rabbitMQ, err := queue.NewRabbitMQ(config.RabbitMQURL, "events")
 	if err != nil {
-		logrus.Infof("failed to connect to RabbitMQ: %v", err)
+		logrus.Fatalf("Failed to connect to RabbitMQ: %v", err)
 	}
+
+	logrus.Info("Initializing Saga orchestrator")
 	saga := subscribers.NewSaga(rabbitMQ)
-	subscribers := subscribers.NewService(subscriberRepo, rabbitMQ, saga)
-	currencyRates, err := rates.Get()
+
+	logrus.Info("Initializing Subscriber service")
+	subscribersService := subscribers.NewService(subscriberRepo, rabbitMQ, saga)
+
+	logrus.Info("Preloading currency rates")
+	currencyRates, err := ratesService.Get()
 	if err != nil {
-		logrus.Infof("cannot preload currency rates: %v\n", err)
+		logrus.Warnf("Cannot preload currency rates: %v", err)
 	}
+
+	logrus.Info("Dependencies initialized successfully")
+
 	return &dependencies{
 		Repo:          repo,
-		Rates:         rates,
-		Subscribers:   subscribers,
+		Rates:         ratesService,
+		Subscribers:   subscribersService,
 		RabbitMQ:      rabbitMQ,
 		currencyRates: currencyRates,
 	}

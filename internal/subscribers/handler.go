@@ -5,6 +5,7 @@ import (
 
 	"github.com/gorilla/mux"
 
+	"github.com/sirupsen/logrus"
 	domains "github.com/skobelina/currency_converter/internal"
 	"github.com/skobelina/currency_converter/pkg/utils/rest"
 	"github.com/skobelina/currency_converter/pkg/utils/serializer"
@@ -40,12 +41,15 @@ func (h *handler) Register(r *mux.Router) {
 func (h *handler) create(w http.ResponseWriter, r *http.Request) error {
 	request := new(SubscriberRequest)
 	if err := serializer.ParseJsonBody(r.Body, request); err != nil {
+		logrus.Warnf("Handler - Error parsing JSON body: %v", err)
 		return err
 	}
 	status, err := h.service.Create(request)
 	if err != nil {
+		logrus.Errorf("Handler - Error creating subscriber: %v", err)
 		return err
 	}
+	logrus.Infof("Handler - Subscriber created successfully")
 	return serializer.SendJSON(w, http.StatusOK, status)
 }
 
@@ -58,12 +62,15 @@ func (h *handler) create(w http.ResponseWriter, r *http.Request) error {
 func (h *handler) search(w http.ResponseWriter, r *http.Request) error {
 	filter, err := getFilterFromQuery(r)
 	if err != nil {
+		logrus.Warnf("Handler - Error getting filter from query: %v", err)
 		return err
 	}
 	response, err := h.service.Search(filter)
 	if err != nil {
+		logrus.Errorf("Handler - Error searching subscribers: %v", err)
 		return err
 	}
+	logrus.Infof("Handler - Subscribers search successful")
 	return serializer.SendJSON(w, http.StatusOK, response)
 }
 
@@ -77,18 +84,22 @@ func (h *handler) search(w http.ResponseWriter, r *http.Request) error {
 func (h *handler) delete(w http.ResponseWriter, r *http.Request) error {
 	request := new(SubscriberRequest)
 	if err := serializer.ParseJsonBody(r.Body, request); err != nil {
+		logrus.Warnf("Handler - Error parsing JSON body: %v", err)
 		return err
 	}
 	status, err := h.service.Delete(request)
 	if err != nil {
+		logrus.Errorf("Handler - Error deleting subscriber: %v", err)
 		return err
 	}
+	logrus.Infof("Handler - Subscriber deleted successfully")
 	return serializer.SendJSON(w, http.StatusOK, status)
 }
 
 func getFilterFromQuery(r *http.Request) (*SearchSubscribeRequest, error) {
 	filter, err := domains.GetFilterFromQuery(r)
 	if err != nil {
+		logrus.Warnf("Handler - Error getting filter from query: %v", err)
 		return nil, serializer.NewBadRequestError(err)
 	}
 	return &SearchSubscribeRequest{

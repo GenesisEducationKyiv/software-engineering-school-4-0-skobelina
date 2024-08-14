@@ -2,12 +2,13 @@ package cronjobs
 
 import (
 	"encoding/json"
-	"log"
 	"net/http"
+	"time"
 
 	"github.com/sirupsen/logrus"
 	"github.com/skobelina/email_sender/internal/mails"
 	"github.com/skobelina/email_sender/internal/mails/templates"
+	"github.com/skobelina/email_sender/pkg/metrics"
 	"github.com/skobelina/email_sender/pkg/queue"
 )
 
@@ -28,13 +29,15 @@ func NewCronJobService(mailService mails.MailServiceInterface, rabbitMQ queue.Qu
 func (s *CronJobService) ConsumeMessages() {
 	msgs, err := s.rabbitMQ.ConsumeMessages()
 	if err != nil {
-		log.Fatalf("Failed to start consuming messages: %v", err)
+		logrus.Fatalf("Failed to start consuming messages: %v", err)
 	}
 
 	for msg := range msgs {
 		var event Event
+		start := time.Now()
 		if err := json.Unmarshal(msg.Body, &event); err != nil {
 			logrus.Errorf("Error unmarshalling message: %v", err)
+			metrics.EmailRequestCount.WithLabelValues("error").Inc()
 			continue
 		}
 
@@ -43,29 +46,36 @@ func (s *CronJobService) ConsumeMessages() {
 			subscriber := &Subscriber{Email: event.Data.Email}
 			if err := s.repo.Create(subscriber); err != nil {
 				logrus.Errorf("Error inserting subscriber: %v", err)
+				metrics.EmailRequestCount.WithLabelValues("error").Inc()
 			} else {
 				logrus.Infof("Successfully inserted subscriber: %s", event.Data.Email)
+				metrics.EmailRequestCount.WithLabelValues("success").Inc()
 			}
 		case "Unsubscribe":
 			subscriber, err := s.repo.FindByEmail(event.Data.Email)
 			if err != nil {
 				logrus.Errorf("Error finding subscriber: %v", err)
+				metrics.EmailRequestCount.WithLabelValues("error").Inc()
 				continue
 			}
 			if err := s.repo.Delete(subscriber); err != nil {
 				logrus.Errorf("Error deleting subscriber: %v", err)
+				metrics.EmailRequestCount.WithLabelValues("error").Inc()
 			} else {
 				logrus.Infof("Successfully deleted subscriber: %s", event.Data.Email)
+				metrics.EmailRequestCount.WithLabelValues("success").Inc()
 			}
 		case "CurrencyRate":
 			subscribers, err := s.repo.Search()
 			if err != nil {
 				logrus.Errorf("Error fetching subscribers from database: %v", err)
+				metrics.EmailRequestCount.WithLabelValues("error").Inc()
 				continue
 			}
 
 			if len(subscribers) == 0 {
 				logrus.Infof("No subscribers found, skipping email sending")
+				metrics.EmailRequestCount.WithLabelValues("no_subscribers").Inc()
 				continue
 			}
 
@@ -82,11 +92,17 @@ func (s *CronJobService) ConsumeMessages() {
 			err = s.mailService.SendEmail(recipients, "Exchange rates notification", template)
 			if err != nil {
 				logrus.Errorf("Error sending email: %v", err)
+				metrics.EmailRequestCount.WithLabelValues("error").Inc()
+			} else {
+				logrus.Infof("CronJob: NotificationExchangeRates: sent to %d subscribers", len(recipients))
+				metrics.EmailRequestCount.WithLabelValues("success").Inc()
 			}
-			logrus.Infof("CronJob: NotificationExchangeRates: sent to %d subscribers", len(recipients))
 		default:
 			logrus.Infof("Ignoring event of type: %s", event.EventType)
 		}
+
+		duration := time.Since(start)
+		metrics.EmailRequestDuration.WithLabelValues("total").Observe(duration.Seconds())
 	}
 }
 

@@ -8,11 +8,13 @@ import (
 
 	"github.com/gorilla/context"
 	"github.com/gorilla/mux"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/sirupsen/logrus"
 
 	cronJobs "github.com/skobelina/currency_converter/internal/cron-jobs"
 	"github.com/skobelina/currency_converter/internal/rates"
 	"github.com/skobelina/currency_converter/internal/subscribers"
+	"github.com/skobelina/currency_converter/pkg/metrics"
 )
 
 type Api interface {
@@ -33,6 +35,7 @@ func New() Api {
 
 	r.Use(
 		OptionsHandler(),
+		LoggingMiddleware(),
 	)
 	return &api{
 		router: r,
@@ -40,7 +43,10 @@ func New() Api {
 }
 
 func (a *api) Handle() error {
+	metrics.Init()
+
 	http.Handle("/", a.router)
+	http.Handle("/metrics", promhttp.Handler())
 	srv := &http.Server{
 		ReadTimeout:  5 * time.Second,
 		WriteTimeout: 10 * time.Second,
